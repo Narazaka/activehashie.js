@@ -1,0 +1,37 @@
+{
+  "name": "activehashie",
+  "version": "1.0.0",
+  "description": "ActiveHash like something",
+  "keywords": [
+    "active_hash"
+  ],
+  "main": "./dist/es2015/index.js",
+  "types": "./dist/es2015/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "dist": "rm -rf dist && tsc",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "tslint *.ts src/**/*.ts test/**/*.ts",
+    "prepublish": "npm run dist"
+  },
+  "author": "Narazaka",
+  "license": "MIT",
+  "url": "https://github.com/Narazaka/activehashie.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Narazaka/activehashie.js.git"
+  },
+  "dependencies": {
+    "@types/lodash.difference": "^4.5.2",
+    "@types/lodash.intersection": "^4.4.2",
+    "js-yaml": "^3.8.2",
+    "lodash.difference": "^4.5.0",
+    "lodash.intersection": "^4.4.0"
+  },
+  "devDependencies": {
+    "tslint": "^4.5.1",
+    "typescript": "^2.2.2"
+  }
+}
