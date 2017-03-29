@@ -1,46 +1,64 @@
+import {ActiveHashRecord, ActiveHashRecordBase} from "./active_hash_record";
 import {ActiveHashRelation} from "./active_hash_relation";
 import {RecordNotFound} from "./record_not_found";
 
-export type ActiveHashOptions = {
-    indexes?: string[];
-};
-
-export type ActiveHashRecord = {
-    id: any;
-    [column: string]: any;
-};
-
 type RecordIndex = Map<any, number[]>;
 
-export class ActiveHash {
-    static readonly indexColumns: string[];
+export type Contitions<Record extends ActiveHashRecord> = {
+    [column in keyof Record]?: Record[column] | Array<Record[column]> | null | undefined;
+};
 
-    static get data() { return this._data; }
-    static set data(data: ActiveHashRecord[]) {
+export class ActiveHash<Record extends ActiveHashRecord> {
+    /** table name */
+    readonly name: string;
+    /** record class */
+    readonly recordClass: new(source: ActiveHashRecordBase) => Record;
+    /** index columns */
+    readonly indexColumns: ReadonlyArray<keyof(Record)>;
+    private _data: Record[];
+    private recordIndexes: Map<string, RecordIndex>;
+
+    constructor(
+        name: string,
+        recordClass: new(source: ActiveHashRecordBase) => Record,
+        options: {indexColumns?: Array<keyof(Record)>} = {},
+    ) {
+        this.name = name;
+        this.indexColumns = Object.freeze((options.indexColumns || []).concat(["id"]));
+        this.recordClass = recordClass;
+        this.resetData();
+    }
+
+    get data() { return this._data; }
+
+    setData(data: ActiveHashRecordBase[]) {
         this.resetData();
         this.push(...data);
     }
 
-    static isExists(record: {id: any}) {
+    isExists(record: {id: any}) {
         return (<RecordIndex> this.recordIndexes.get("id")).has(record.id);
     }
 
-    static push(...records: ActiveHashRecord[]) {
+    push(...records: ActiveHashRecordBase[]) {
         let nextId = this.nextId() - 1;
+        const useRecords: Record[] = Array(records.length);
         for (const record of records) {
             if (record.id == null) record.id = ++nextId;
+            useRecords.push(record instanceof this.recordClass ? record : new this.recordClass(record));
         }
-        this.addToRecordIndex(records, this.data.length);
-        this.data.push(...records);
+        for (const record of useRecords) record._parentTable = this; // 親参照できるように
+        this.addToRecordIndex(useRecords, this.data.length);
+        this.data.push(...useRecords);
     }
 
-    static nextId() {
+    nextId() {
         const recordIndex = <RecordIndex> this.recordIndexes.get("id");
         const maxId = Math.max(...(<number[]> Array.from(recordIndex.keys())));
         return maxId === -Infinity ? 1 : maxId + 1; // 1つでもidが数値でない場合NaNになる
     }
 
-    static searchIndexesByUsingIndex(column: string, values: any[]) {
+    searchIndexesByUsingIndex(column: string, values: any[]) {
         const recordIndex = this.recordIndexes.get(column);
         if (!recordIndex) return;
         return <number[]> values
@@ -48,24 +66,24 @@ export class ActiveHash {
             .reduce((allIndexes, indexes) => (<number[]> allIndexes).concat(indexes || []), []);
     }
 
-    static all() {
+    all(): ActiveHashRelation<Record> {
         return new ActiveHashRelation(this);
     }
 
-    static where(conditions?: {[column: string]: any}) {
+    where(conditions?: Contitions<Record>) {
         return this.all().where(conditions);
     }
 
-    static find_by(conditions: {[column: string]: any}) {
+    find_by(conditions: Contitions<Record>) {
         return this.all().find_by(conditions);
     }
 
-    static count() {
+    count() {
         return this.data.length;
     }
 
-    static find(id: any) {
-        const record = this.find_by({id});
+    find(id: any) {
+        const record = this.find_by(<any> {id});
         if (record) {
             return record;
         } else {
@@ -73,11 +91,8 @@ export class ActiveHash {
         }
     }
 
-    private static _data: ActiveHashRecord[];
-    private static recordIndexes: Map<string, RecordIndex>;
-
-    private static addToRecordIndex(records: ActiveHashRecord[], minIndex: number) {
-        for (const indexColumn of (this.indexColumns || []).concat(["id"])) {
+    private addToRecordIndex(records: Record[], minIndex: number) {
+        for (const indexColumn of this.indexColumns) {
             const recordIndex = <RecordIndex> this.recordIndexes.get(indexColumn);
             let index = minIndex;
             for (const record of records) {
@@ -93,10 +108,10 @@ export class ActiveHash {
         }
     }
 
-    private static resetData() {
+    private resetData() {
         this._data = [];
         this.recordIndexes = new Map();
-        for (const indexColumn of (this.indexColumns || []).concat(["id"])) {
+        for (const indexColumn of this.indexColumns) {
             this.recordIndexes.set(indexColumn, new Map());
         }
     }

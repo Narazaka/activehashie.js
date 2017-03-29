@@ -1,13 +1,16 @@
 import intersection = require("lodash.intersection");
 import difference = require("lodash.difference");
-import {ActiveHash} from "./active_hash";
+import {ActiveHash, Contitions} from "./active_hash";
+import {ActiveHashRecord} from "./active_hash_record";
 
-export class ActiveHashRelation {
-    private source: typeof ActiveHash;
-    private filters: Array<(source: ActiveHash, filteredIndexes: number[]) => number[]>;
+export class ActiveHashRelation<Record extends ActiveHashRecord> {
+    private source: ActiveHash<Record>;
+    private filters: Array<(source: ActiveHash<Record>, filteredIndexes: number[]) => number[]>;
 
     constructor(
-        source: typeof ActiveHash, filters: Array<(source: ActiveHash, filteredIndexes: number[]) => number[]> = [],
+        source: ActiveHash<Record>,
+        filters: Array<(source: ActiveHash<Record>,
+        filteredIndexes: number[]) => number[]> = [],
     ) {
         this.source = source;
         this.filters = filters;
@@ -17,25 +20,25 @@ export class ActiveHashRelation {
         return new ActiveHashRelation(this.source, this.filters);
     }
 
-    where(conditions?: {[column: string]: any}) {
+    where(conditions?: Contitions<Record>) {
         if (!conditions) return this.all();
-        const finder = (source: typeof ActiveHash, filteredIndexes: number[]) => {
+        const finder = (source: ActiveHash<Record>, filteredIndexes: number[]) => {
             const {indexes, restConditions} = this.filterByIndex(source, filteredIndexes, conditions);
             return this.filterByMatch(source, indexes, restConditions);
         };
         return new ActiveHashRelation(this.source, this.filters.concat([finder]));
     }
 
-    not(conditions: {[column: string]: any}) {
+    not(conditions: Contitions<Record>) {
         if (!conditions) return this.all();
-        const finder = (source: typeof ActiveHash, filteredIndexes: number[]) => {
+        const finder = (source: ActiveHash<Record>, filteredIndexes: number[]) => {
             const {indexes, restConditions} = this.filterByIndex(source, filteredIndexes, conditions, true);
             return this.filterByMatch(source, indexes, restConditions, true);
         };
         return new ActiveHashRelation(this.source, this.filters.concat([finder]));
     }
 
-    find_by(conditions: {[column: string]: any}) {
+    find_by(conditions: Contitions<Record>): Record | undefined {
         return this.where(conditions).toArray()[0];
     }
 
@@ -56,17 +59,17 @@ export class ActiveHashRelation {
     }
 
     private filterByIndex(
-        source: typeof ActiveHash, filteredIndexes: number[], conditions: {[column: string]: any}, not = false,
+        source: ActiveHash<Record>, filteredIndexes: number[], conditions: Contitions<Record>, not = false,
     ) {
         const filteredIndexesList = [];
-        const restConditions = [];
-        for (const column of Object.keys(conditions)) {
+        const restConditions: Contitions<Record> = {};
+        for (const column of <Array<keyof Record>> Object.keys(conditions)) {
             const value = conditions[column];
             const indexes = source.searchIndexesByUsingIndex(column, value instanceof Array ? value : [value]);
             if (indexes) {
                 filteredIndexesList.push(indexes);
             } else {
-                restConditions.push(column);
+                restConditions[column] = conditions[column];
             }
         }
         return {
@@ -78,11 +81,11 @@ export class ActiveHashRelation {
     }
 
     private filterByMatch(
-        source: typeof ActiveHash, filteredIndexes: number[], conditions: {[column: string]: any}, not = false,
+        source: ActiveHash<Record>, filteredIndexes: number[], conditions: Contitions<Record>, not = false,
     ) {
         return filteredIndexes.filter((index) => {
             const record = source.data[index];
-            const matched = Object.keys(conditions).every((column) => {
+            const matched = Object.keys(conditions).every((column: keyof Record) => {
                 const value = conditions[column];
                 if (value instanceof Array) {
                     return value.indexOf(record[column]) !== -1;
