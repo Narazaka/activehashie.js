@@ -1,0 +1,10 @@
+engines:
+  tslint:
+    enabled: true
+ratings:
+  paths:
+    - "src/**"
+    - "test/**"
+    - "/*"
+    - "**.js"
+    - "**.ts"
