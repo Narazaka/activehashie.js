@@ -10,7 +10,7 @@
 [![Travis Build Status](https://travis-ci.org/Narazaka/activehashie.js.svg)](https://travis-ci.org/Narazaka/activehashie.js)
 [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/Narazaka/activehashie.js?svg=true)](https://ci.appveyor.com/project/Narazaka/activehashie-js)
 [![codecov.io](https://codecov.io/github/Narazaka/activehashie.js/coverage.svg?branch=master)](https://codecov.io/github/Narazaka/activehashie.js?branch=master)
-[![Code Climate](https://codeclimate.com/github/Narazaka/activehashie.js/badges/gpa.svg)](https://codeclimate.com/github/Narazaka/activehashie.js)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/7657d5c839564b44b9b7f6e47c6a9896)](https://www.codacy.com/app/narazaka/activehashie-js?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Narazaka/activehashie.js&amp;utm_campaign=Badge_Grade)
 
 Immutable(currently) table whose api is like great [ActiveHash](https://github.com/zilkey/active_hash).
 
