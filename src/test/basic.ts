@@ -35,6 +35,7 @@ test("basic queries", (t) => {
     t.is(Item.count(), 6);
     t.is(Item.find(11).name, "n11");
     t.is(Item.find_by({id: 100}), undefined);
+    t.true(Item.isExists({id: 11}));
     const id123 = Item.where({id: [13, 12, 11]});
     t.is(id123.count(), 2);
     t.deepEqual(toId(id123), [11, 12]);
