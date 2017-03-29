@@ -24,11 +24,17 @@
     "url": "https://github.com/Narazaka/activehashie.js.git"
   },
   "dependencies": {
+    "@types/js-yaml": "^3.5.29",
     "@types/lodash.difference": "^4.5.2",
     "@types/lodash.intersection": "^4.4.2",
+    "@types/lodash.snakecase": "^4.1.2",
+    "@types/node": "^7.0.12",
+    "@types/pluralize": "^0.0.27",
     "js-yaml": "^3.8.2",
     "lodash.difference": "^4.5.0",
-    "lodash.intersection": "^4.4.0"
+    "lodash.intersection": "^4.4.0",
+    "lodash.snakecase": "^4.1.1",
+    "pluralize": "^4.0.0"
   },
   "devDependencies": {
     "tslint": "^4.5.1",

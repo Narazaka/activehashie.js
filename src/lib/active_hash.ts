@@ -13,43 +13,34 @@ export type ActiveHashRecord = {
 type RecordIndex = Map<any, number[]>;
 
 export class ActiveHash {
-    readonly name: string;
-    readonly indexesOption: ReadonlyArray<string>;
-    private _data: ActiveHashRecord[];
-    private recordIndexes: Map<string, RecordIndex> = new Map();
+    static readonly indexColumns: string[];
 
-    constructor(name: string, options: ActiveHashOptions = {}) {
-        this.name = name;
-        this.indexesOption = Object.freeze((options.indexes || []).concat(["id"]));
-        this.resetData();
-    }
-
-    get data() { return this._data; }
-    set data(data: ActiveHashRecord[]) {
+    static get data() { return this._data; }
+    static set data(data: ActiveHashRecord[]) {
         this.resetData();
         this.push(...data);
     }
 
-    isExists(record: {id: any}) {
+    static isExists(record: {id: any}) {
         return (<RecordIndex> this.recordIndexes.get("id")).has(record.id);
     }
 
-    push(...records: ActiveHashRecord[]) {
+    static push(...records: ActiveHashRecord[]) {
         let nextId = this.nextId() - 1;
         for (const record of records) {
             if (record.id == null) record.id = ++nextId;
         }
         this.addToRecordIndex(records, this.data.length);
-        this._data.push(...records);
+        this.data.push(...records);
     }
 
-    nextId() {
+    static nextId() {
         const recordIndex = <RecordIndex> this.recordIndexes.get("id");
         const maxId = Math.max(...(<number[]> Array.from(recordIndex.keys())));
         return maxId === -Infinity ? 1 : maxId + 1; // 1つでもidが数値でない場合NaNになる
     }
 
-    searchIndexesByUsingIndex(column: string, values: any[]) {
+    static searchIndexesByUsingIndex(column: string, values: any[]) {
         const recordIndex = this.recordIndexes.get(column);
         if (!recordIndex) return;
         return <number[]> values
@@ -57,23 +48,23 @@ export class ActiveHash {
             .reduce((allIndexes, indexes) => (<number[]> allIndexes).concat(indexes || []), []);
     }
 
-    all() {
+    static all() {
         return new ActiveHashRelation(this);
     }
 
-    where(conditions?: {[column: string]: any}) {
+    static where(conditions?: {[column: string]: any}) {
         return this.all().where(conditions);
     }
 
-    find_by(conditions: {[column: string]: any}) {
+    static find_by(conditions: {[column: string]: any}) {
         return this.all().find_by(conditions);
     }
 
-    length() {
+    static count() {
         return this.data.length;
     }
 
-    find(id: any) {
+    static find(id: any) {
         const record = this.find_by({id});
         if (record) {
             return record;
@@ -82,12 +73,15 @@ export class ActiveHash {
         }
     }
 
-    private addToRecordIndex(records: ActiveHashRecord[], minIndex: number) {
-        for (const indexOption of this.indexesOption) {
-            const recordIndex = <RecordIndex> this.recordIndexes.get(indexOption);
+    private static _data: ActiveHashRecord[];
+    private static recordIndexes: Map<string, RecordIndex>;
+
+    private static addToRecordIndex(records: ActiveHashRecord[], minIndex: number) {
+        for (const indexColumn of (this.indexColumns || []).concat(["id"])) {
+            const recordIndex = <RecordIndex> this.recordIndexes.get(indexColumn);
             let index = minIndex;
             for (const record of records) {
-                const keyValue = record[indexOption];
+                const keyValue = record[indexColumn];
                 let keyIndexes = recordIndex.get(keyValue);
                 if (!keyIndexes) {
                     keyIndexes = [];
@@ -99,10 +93,11 @@ export class ActiveHash {
         }
     }
 
-    private resetData() {
+    private static resetData() {
         this._data = [];
-        for (const indexOption of this.indexesOption) {
-            this.recordIndexes.set(indexOption, new Map());
+        this.recordIndexes = new Map();
+        for (const indexColumn of (this.indexColumns || []).concat(["id"])) {
+            this.recordIndexes.set(indexColumn, new Map());
         }
     }
 }

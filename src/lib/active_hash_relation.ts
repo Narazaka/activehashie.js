@@ -3,10 +3,12 @@ import difference = require("lodash.difference");
 import {ActiveHash} from "./active_hash";
 
 export class ActiveHashRelation {
-    private source: ActiveHash;
+    private source: typeof ActiveHash;
     private filters: Array<(source: ActiveHash, filteredIndexes: number[]) => number[]>;
 
-    constructor(source: ActiveHash, filters: Array<(source: ActiveHash, filteredIndexes: number[]) => number[]> = []) {
+    constructor(
+        source: typeof ActiveHash, filters: Array<(source: ActiveHash, filteredIndexes: number[]) => number[]> = [],
+    ) {
         this.source = source;
         this.filters = filters;
     }
@@ -17,7 +19,7 @@ export class ActiveHashRelation {
 
     where(conditions?: {[column: string]: any}) {
         if (!conditions) return this.all();
-        const finder = (source: ActiveHash, filteredIndexes: number[]) => {
+        const finder = (source: typeof ActiveHash, filteredIndexes: number[]) => {
             const {indexes, restConditions} = this.filterByIndex(source, filteredIndexes, conditions);
             return this.filterByMatch(source, indexes, restConditions);
         };
@@ -26,7 +28,7 @@ export class ActiveHashRelation {
 
     not(conditions: {[column: string]: any}) {
         if (!conditions) return this.all();
-        const finder = (source: ActiveHash, filteredIndexes: number[]) => {
+        const finder = (source: typeof ActiveHash, filteredIndexes: number[]) => {
             const {indexes, restConditions} = this.filterByIndex(source, filteredIndexes, conditions, true);
             return this.filterByMatch(source, indexes, restConditions, true);
         };
@@ -37,7 +39,7 @@ export class ActiveHashRelation {
         return this.where(conditions).toArray()[0];
     }
 
-    length() {
+    count() {
         return this.toArray().length;
     }
 
@@ -54,7 +56,7 @@ export class ActiveHashRelation {
     }
 
     private filterByIndex(
-        source: ActiveHash, filteredIndexes: number[], conditions: {[column: string]: any}, not = false,
+        source: typeof ActiveHash, filteredIndexes: number[], conditions: {[column: string]: any}, not = false,
     ) {
         const filteredIndexesList = [];
         const restConditions = [];
@@ -76,7 +78,7 @@ export class ActiveHashRelation {
     }
 
     private filterByMatch(
-        source: ActiveHash, filteredIndexes: number[], conditions: {[column: string]: any}, not = false,
+        source: typeof ActiveHash, filteredIndexes: number[], conditions: {[column: string]: any}, not = false,
     ) {
         return filteredIndexes.filter((index) => {
             const record = source.data[index];
