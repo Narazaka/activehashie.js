@@ -10,8 +10,7 @@ export class ActiveHashRelation<Record extends ActiveHashRecord> {
 
     constructor(
         source: ActiveHash<Record>,
-        filters: Array<(source: ActiveHash<Record>,
-        filteredIndexes: number[]) => number[]> = [],
+        filters: Array<(source: ActiveHash<Record>, filteredIndexes: number[]) => number[]> = [],
     ) {
         this.source = source;
         this.filters = filters;

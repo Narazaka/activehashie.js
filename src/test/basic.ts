@@ -1,5 +1,6 @@
 import test from "ava";
-import {ActiveHash, ActiveHashRecord, ActiveHashRelation} from "../lib";
+import {ActiveHash, ActiveHashRecord} from "../lib";
+import {toId} from "./util";
 
 class ItemGroupRecord extends ActiveHashRecord {
     name: string;
@@ -30,10 +31,6 @@ ItemGroup.setData([
     new ItemGroupRecord({id: 2, name: "g2"}),
 ]);
 
-function toId<Record extends ActiveHashRecord>(relation: ActiveHashRelation<Record>) {
-    return relation.toArray().map((record) => record.id);
-}
-
 test("basic queries", (t) => {
     t.is(Item.count(), 6);
     t.is(Item.find(11).name, "n11");
@@ -41,6 +38,7 @@ test("basic queries", (t) => {
     const id123 = Item.where({id: [13, 12, 11]});
     t.is(id123.count(), 2);
     t.deepEqual(toId(id123), [11, 12]);
+    t.deepEqual(toId(Item.all()), [11, 12, 21, 22, 23, 31]);
     t.deepEqual(toId(Item.where({type: "b"}).where({item_group_id: 2})), [22, 23]);
     t.deepEqual(toId(Item.where().not({type: "a"})), [22, 23, 31]);
     t.deepEqual(toId(Item.where().not({id: 11})), [12, 21, 22, 23, 31]);

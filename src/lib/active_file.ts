@@ -1,5 +1,5 @@
 import {ActiveHash, Contitions} from "./active_hash";
-import {ActiveHashRecord} from "./active_hash_record";
+import {ActiveHashRecord, ActiveHashRecordBase} from "./active_hash_record";
 import {ActiveHashRelation} from "./active_hash_relation";
 import snakeCase = require("lodash.snakecase");
 import * as fs from "fs";
@@ -7,12 +7,28 @@ import * as path from "path";
 import * as pluralize from "pluralize";
 
 export class ActiveFile<Record extends ActiveHashRecord> extends ActiveHash<Record> {
-    readonly filename: string;
-    readonly filenames: string[];
-    readonly rootPath: string;
+    readonly filename?: string;
+    readonly filenames?: string[];
+    readonly rootPath?: string;
     dataLoaded = false;
 
-    reload(force = true) {
+    constructor(
+        name: string,
+        recordClass: new(source: ActiveHashRecordBase) => Record,
+        options: {
+            indexColumns?: Array<keyof(Record)>,
+            filename?: string,
+            filenames?: string[],
+            rootPath?: string,
+        } = {},
+    ) {
+        super(name, recordClass, options);
+        this.filename = options.filename;
+        this.filenames = options.filenames;
+        this.rootPath = options.rootPath;
+    }
+
+    reload(force = false) {
         if (!force && this.dataLoaded) return;
         this.dataLoaded = true;
         this.setData(this.loadFiles());
@@ -47,7 +63,8 @@ export class ActiveFile<Record extends ActiveHashRecord> extends ActiveHash<Reco
         } else {
             if (fs.existsSync(this.fullPathBase)) {
                 return fs.readdirSync(this.fullPathBase)
-                    .map((filename) => path.join(this.actualRootPath, `${filename}.${this.extension}`));
+                    .filter((filename) => path.extname(filename) === `.${this.extension}`)
+                    .map((filename) => path.join(this.fullPathBase, filename));
             } else {
                 return [`${this.fullPathBase}.${this.extension}`];
             }
