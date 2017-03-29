@@ -2,6 +2,7 @@ import intersection = require("lodash.intersection");
 import difference = require("lodash.difference");
 import {ActiveHash, Contitions} from "./active_hash";
 import {ActiveHashRecord} from "./active_hash_record";
+import {RecordNotFound} from "./record_not_found";
 
 export class ActiveHashRelation<Record extends ActiveHashRecord> {
     private source: ActiveHash<Record>;
@@ -42,6 +43,15 @@ export class ActiveHashRelation<Record extends ActiveHashRecord> {
         return this.where(conditions).toArray()[0];
     }
 
+    find(id: any) {
+        const record = this.find_by(<any> {id});
+        if (record) {
+            return record;
+        } else {
+            throw new RecordNotFound(`Couldn't find ${this.source.name} with ID=${id}`);
+        }
+    }
+
     count() {
         return this.toArray().length;
     }
@@ -53,7 +63,7 @@ export class ActiveHashRelation<Record extends ActiveHashRecord> {
     private filteredIndexes() {
         const indexes = this.filters.reduce(
             (filteredIndexes, filter) => filter(this.source, filteredIndexes),
-            Array(this.source.data.length),
+            Array.from(Array(this.source.data.length).keys()),
         );
         return indexes.sort();
     }
@@ -83,9 +93,11 @@ export class ActiveHashRelation<Record extends ActiveHashRecord> {
     private filterByMatch(
         source: ActiveHash<Record>, filteredIndexes: number[], conditions: Contitions<Record>, not = false,
     ) {
+        const columns = Object.keys(conditions);
+        if (!columns.length) return filteredIndexes;
         return filteredIndexes.filter((index) => {
             const record = source.data[index];
-            const matched = Object.keys(conditions).every((column: keyof Record) => {
+            const matched = columns.every((column: keyof Record) => {
                 const value = conditions[column];
                 if (value instanceof Array) {
                     return value.indexOf(record[column]) !== -1;

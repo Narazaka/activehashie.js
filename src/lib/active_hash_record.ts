@@ -35,4 +35,5 @@ export class ActiveHashRecord implements ActiveHashRecordBase {
 
 export interface ActiveHashRecordBase {
     id: any;
+    [column: string]: any;
 }

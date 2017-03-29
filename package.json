@@ -1,18 +1,18 @@
 {
   "name": "activehashie",
   "version": "1.0.0",
-  "description": "ActiveHash like something",
+  "description": "The ActiveHash like something",
   "keywords": [
     "active_hash"
   ],
-  "main": "./dist/es2015/index.js",
-  "types": "./dist/es2015/index.d.ts",
+  "main": "./dist/es2015/lib/index.js",
+  "types": "./dist/es2015/lib/index.d.ts",
   "files": [
-    "dist"
+    "dist/es2015/lib"
   ],
   "scripts": {
     "dist": "rm -rf dist && tsc",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "npm run dist && nyc -r html -r text -r lcov ava ./dist/es2015/test",
     "lint": "tslint *.ts src/**/*.ts test/**/*.ts",
     "prepublish": "npm run dist"
   },
@@ -37,6 +37,8 @@
     "pluralize": "^4.0.0"
   },
   "devDependencies": {
+    "ava": "^0.18.2",
+    "nyc": "^10.2.0",
     "tslint": "^4.5.1",
     "typescript": "^2.2.2"
   }

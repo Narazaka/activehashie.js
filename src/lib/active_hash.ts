@@ -1,6 +1,5 @@
 import {ActiveHashRecord, ActiveHashRecordBase} from "./active_hash_record";
 import {ActiveHashRelation} from "./active_hash_relation";
-import {RecordNotFound} from "./record_not_found";
 
 type RecordIndex = Map<any, number[]>;
 
@@ -43,9 +42,11 @@ export class ActiveHash<Record extends ActiveHashRecord> {
     push(...records: ActiveHashRecordBase[]) {
         let nextId = this.nextId() - 1;
         const useRecords: Record[] = Array(records.length);
+        let index = 0;
         for (const record of records) {
             if (record.id == null) record.id = ++nextId;
-            useRecords.push(record instanceof this.recordClass ? record : new this.recordClass(record));
+            useRecords[index] = record instanceof this.recordClass ? record : new this.recordClass(record);
+            ++index;
         }
         for (const record of useRecords) record._parentTable = this; // 親参照できるように
         this.addToRecordIndex(useRecords, this.data.length);
@@ -78,17 +79,12 @@ export class ActiveHash<Record extends ActiveHashRecord> {
         return this.all().find_by(conditions);
     }
 
-    count() {
-        return this.data.length;
+    find(id: any) {
+        return this.all().find(id);
     }
 
-    find(id: any) {
-        const record = this.find_by(<any> {id});
-        if (record) {
-            return record;
-        } else {
-            throw new RecordNotFound(`Couldn't find ${this.name} with ID=${id}`);
-        }
+    count() {
+        return this.data.length;
     }
 
     private addToRecordIndex(records: Record[], minIndex: number) {
