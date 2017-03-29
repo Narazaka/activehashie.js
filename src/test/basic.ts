@@ -1,3 +1,4 @@
+/* tslint:disable:variable-name max-classes-per-file */
 import test from "ava";
 import {ActiveHash, ActiveHashRecord} from "../lib";
 import {toId} from "./util";

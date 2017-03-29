@@ -1,3 +1,4 @@
+/* tslint:disable:variable-name max-classes-per-file */
 import test from "ava";
 import * as fs from "fs";
 import * as path from "path";
