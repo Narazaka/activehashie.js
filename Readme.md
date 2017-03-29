@@ -5,6 +5,7 @@ Immutable(currently) table whose api is like great [ActiveHash](https://github.c
 ## Synopsys
 
 ```typescript
+// TypeScript!
 import {ActiveHash, ActiveHashRecord} from "activehashie";
 
 class ItemGroupRecord extends ActiveHashRecord {
