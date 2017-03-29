@@ -1,0 +1,10 @@
+language: node_js
+node_js:
+  - 6
+os:
+  - linux
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
+cache:
+  directories:
+    - node_modules
