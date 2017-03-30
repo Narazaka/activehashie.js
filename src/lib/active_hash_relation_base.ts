@@ -1,10 +1,10 @@
 import intersection = require("lodash.intersection");
 import difference = require("lodash.difference");
-import {ActiveHash, Contitions} from "./active_hash";
+import {ActiveHash} from "./active_hash";
 import {ActiveHashRecord} from "./active_hash_record";
 import {ActiveHashRelationEager} from "./active_hash_relation_eager";
 import {ActiveHashRelationLazy} from "./active_hash_relation_lazy";
-import {Queryable} from "./queryable";
+import {ActiveHashRecordFilter, ActiveHashRecordValueFilter, Contitions, Queryable} from "./queryable";
 import {RecordNotFound} from "./record_not_found";
 
 export abstract class ActiveHashRelationBase<Record extends ActiveHashRecord> implements Queryable<Record> {
@@ -28,10 +28,10 @@ export abstract class ActiveHashRelationBase<Record extends ActiveHashRecord> im
 
     abstract not(conditions: Contitions<Record>): ActiveHashRelationBase<Record>;
 
-    abstract filter(callback: (record: Record) => boolean): ActiveHashRelationBase<Record>;
+    abstract filter(callback: ActiveHashRecordFilter<Record>): ActiveHashRelationBase<Record>;
 
     abstract filterByColumn<Column extends keyof Record>(
-        column: Column, callback: (value: Record[Column]) => boolean,
+        column: Column, callback: ActiveHashRecordValueFilter<Record, Column>,
     ): ActiveHashRelationBase<Record>;
 
     find_by(conditions: Contitions<Record>): Record | undefined {

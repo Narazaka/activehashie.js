@@ -1,13 +1,12 @@
-import {ActiveHash, Contitions} from "./active_hash";
+import {ActiveHash} from "./active_hash";
 import {ActiveHashRecord} from "./active_hash_record";
 import {ActiveHashRelationBase} from "./active_hash_relation_base";
 import {ActiveHashRelationLazy} from "./active_hash_relation_lazy";
-import {EagerQueryable} from "./queryable";
+import {ActiveHashRecordFilter, ActiveHashRecordValueFilter, Contitions, EagerQueryable} from "./queryable";
 
 export class ActiveHashRelationEager<Record extends ActiveHashRecord>
     extends ActiveHashRelationBase<Record>
-    implements EagerQueryable<Record>
-{
+    implements EagerQueryable<Record> {
     private filteredIndexes: number[];
 
     constructor(
@@ -45,14 +44,14 @@ export class ActiveHashRelationEager<Record extends ActiveHashRecord>
         );
     }
 
-    filter(callback: (record: Record) => boolean) {
+    filter(callback: ActiveHashRecordFilter<Record>) {
         return new ActiveHashRelationEager(
             this.source,
             this.buildFilterFinder(callback)(this.source, this.filteredIndexes),
         );
     }
 
-    filterByColumn<Column extends keyof Record>(column: Column, callback: (value: Record[Column]) => boolean) {
+    filterByColumn<Column extends keyof Record>(column: Column, callback: ActiveHashRecordValueFilter<Record, Column>) {
         return new ActiveHashRelationEager(
             this.source,
             this.buildFilterByColumnFinder(column, callback)(this.source, this.filteredIndexes),

@@ -1,13 +1,12 @@
-import {ActiveHash, Contitions} from "./active_hash";
+import {ActiveHash} from "./active_hash";
 import {ActiveHashRecord} from "./active_hash_record";
 import {ActiveHashRelationBase} from "./active_hash_relation_base";
 import {ActiveHashRelationEager} from "./active_hash_relation_eager";
-import {LazyQueryable} from "./queryable";
+import {ActiveHashRecordFilter, ActiveHashRecordValueFilter, Contitions, LazyQueryable} from "./queryable";
 
 export class ActiveHashRelationLazy<Record extends ActiveHashRecord>
     extends ActiveHashRelationBase<Record>
-    implements LazyQueryable<Record>
-{
+    implements LazyQueryable<Record> {
     private filters: Array<(source: ActiveHash<Record>, filteredIndexes: number[]) => number[]>;
 
     constructor(
@@ -39,11 +38,11 @@ export class ActiveHashRelationLazy<Record extends ActiveHashRecord>
         return new ActiveHashRelationLazy(this.source, this.filters.concat([this.buildNotFinder(conditions)]));
     }
 
-    filter(callback: (record: Record) => boolean) {
+    filter(callback: ActiveHashRecordFilter<Record>) {
         return new ActiveHashRelationLazy(this.source, this.filters.concat([this.buildFilterFinder(callback)]));
     }
 
-    filterByColumn<Column extends keyof Record>(column: Column, callback: (value: Record[Column]) => boolean) {
+    filterByColumn<Column extends keyof Record>(column: Column, callback: ActiveHashRecordValueFilter<Record, Column>) {
         return new ActiveHashRelationLazy(
             this.source,
             this.filters.concat([this.buildFilterByColumnFinder(column, callback)]),

@@ -1,13 +1,9 @@
 import {ActiveHashRecord, ActiveHashRecordBase} from "./active_hash_record";
 import {ActiveHashRelationEager} from "./active_hash_relation_eager";
 import {ActiveHashRelationLazy} from "./active_hash_relation_lazy";
-import {EagerQueryable} from "./queryable";
+import {ActiveHashRecordFilter, ActiveHashRecordValueFilter, Contitions, EagerQueryable} from "./queryable";
 
 type RecordIndex = Map<any, number[]>;
-
-export type Contitions<Record extends ActiveHashRecord> = {
-    [column in keyof Record]?: Record[column] | Array<Record[column]> | null | undefined;
-};
 
 export class ActiveHash<Record extends ActiveHashRecord> implements EagerQueryable<Record> {
     /** table name */
@@ -92,11 +88,11 @@ export class ActiveHash<Record extends ActiveHashRecord> implements EagerQueryab
         return this.all().not(conditions);
     }
 
-    filter(callback: (record: Record) => boolean) {
+    filter(callback: ActiveHashRecordFilter<Record>) {
         return this.all().filter(callback);
     }
 
-    filterByColumn<Column extends keyof Record>(column: Column, callback: (value: Record[Column]) => boolean) {
+    filterByColumn<Column extends keyof Record>(column: Column, callback: ActiveHashRecordValueFilter<Record, Column>) {
         return this.all().filterByColumn(column, callback);
     }
 

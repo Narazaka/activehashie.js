@@ -1,8 +1,14 @@
-import {Contitions} from "./active_hash";
 import {ActiveHashRecord} from "./active_hash_record";
 import {ActiveHashRelationBase} from "./active_hash_relation_base";
 import {ActiveHashRelationEager} from "./active_hash_relation_eager";
 import {ActiveHashRelationLazy} from "./active_hash_relation_lazy";
+
+export type Contitions<Record extends ActiveHashRecord> = {
+    [column in keyof Record]?: Record[column] | Array<Record[column]> | null | undefined;
+};
+export type ActiveHashRecordFilter<Record extends ActiveHashRecord> = (record: Record) => boolean;
+export type ActiveHashRecordValueFilter<Record extends ActiveHashRecord, Column extends keyof Record> =
+    (value: Record[Column]) => boolean;
 
 export interface Queryable<Record extends ActiveHashRecord> {
     name: string;
@@ -12,8 +18,8 @@ export interface Queryable<Record extends ActiveHashRecord> {
     lazy(): ActiveHashRelationLazy<Record>;
     where(conditions?: Contitions<Record>): ActiveHashRelationBase<Record>;
     not(conditions: Contitions<Record>): ActiveHashRelationBase<Record>;
-    filter(callback: (record: Record) => boolean): ActiveHashRelationBase<Record>;
-    filterByColumn<Column extends keyof Record>(column: Column, callback: (value: Record[Column]) => boolean):
+    filter(callback: ActiveHashRecordFilter<Record>): ActiveHashRelationBase<Record>;
+    filterByColumn<Column extends keyof Record>(column: Column, callback: ActiveHashRecordValueFilter<Record, Column>):
         ActiveHashRelationBase<Record>;
     find_by(conditions: Contitions<Record>): Record | undefined;
     find(id: any): Record;
@@ -34,8 +40,8 @@ export interface QueryableByEvaluation<
     all(): ActiveHashRelationByEvaluation<Record>[Evaluation];
     where(conditions?: Contitions<Record>): ActiveHashRelationByEvaluation<Record>[Evaluation];
     not(conditions: Contitions<Record>): ActiveHashRelationByEvaluation<Record>[Evaluation];
-    filter(callback: (record: Record) => boolean): ActiveHashRelationByEvaluation<Record>[Evaluation];
-    filterByColumn<Column extends keyof Record>(column: Column, callback: (value: Record[Column]) => boolean):
+    filter(callback: ActiveHashRecordFilter<Record>): ActiveHashRelationByEvaluation<Record>[Evaluation];
+    filterByColumn<Column extends keyof Record>(column: Column, callback: ActiveHashRecordValueFilter<Record, Column>):
         ActiveHashRelationByEvaluation<Record>[Evaluation];
 };
 
