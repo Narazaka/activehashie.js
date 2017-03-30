@@ -64,6 +64,13 @@ test("basic queries for ActiveHash", queryTestFor(Item));
 test("basic queries for eager", queryTestFor(Item.eager()));
 test("basic queries for lazy", queryTestFor(Item.lazy()));
 
+test("eager and lazy", (t) => {
+    t.deepEqual(
+        Item.eager().where({type: "b"}).lazy().where({item_group_id: 2}).toArray(),
+        Item.lazy().where({type: "b"}).eager().where({item_group_id: 2}).toArray(),
+    );
+});
+
 test("associations", (t) => {
     const item11 = Item.find(11);
     t.is(item11.itemGroup, ItemGroup.find(item11.item_group_id));
