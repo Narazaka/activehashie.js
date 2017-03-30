@@ -1,5 +1,6 @@
 import {ActiveHashRecord, ActiveHashRecordBase} from "./active_hash_record";
-import {ActiveHashRelation} from "./active_hash_relation";
+import {ActiveHashRelationEager} from "./active_hash_relation_eager";
+import {ActiveHashRelationLazy} from "./active_hash_relation_lazy";
 import {Queryable} from "./queryable";
 
 type RecordIndex = Map<any, number[]>;
@@ -68,12 +69,24 @@ export class ActiveHash<Record extends ActiveHashRecord> implements Queryable<Re
             .reduce((allIndexes, indexes) => (<number[]> allIndexes).concat(indexes || []), []);
     }
 
-    all(): ActiveHashRelation<Record> {
-        return new ActiveHashRelation(this);
+    all() {
+        return this.eager();
+    }
+
+    eager(): ActiveHashRelationEager<Record> {
+        return new ActiveHashRelationEager(this);
+    }
+
+    lazy(): ActiveHashRelationLazy<Record> {
+        return new ActiveHashRelationLazy(this);
     }
 
     where(conditions?: Contitions<Record>) {
         return this.all().where(conditions);
+    }
+
+    not(conditions: Contitions<Record>) {
+        return this.all().not(conditions);
     }
 
     filter(callback: (record: Record) => boolean) {

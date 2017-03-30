@@ -1,5 +1,5 @@
 import {ActiveHash} from "./active_hash";
-import {ActiveHashRelation} from "./active_hash_relation";
+import {ActiveHashRelationBase} from "./active_hash_relation_base";
 import snakeCase = require("lodash.snakecase");
 
 export class ActiveHashRecord implements ActiveHashRecordBase {
@@ -12,7 +12,7 @@ export class ActiveHashRecord implements ActiveHashRecordBase {
 
     protected hasMany<Record extends ActiveHashRecord>(
         target: ActiveHash<Record>, foreignKey?: keyof Record,
-    ): ActiveHashRelation<Record> {
+    ): ActiveHashRelationBase<Record> {
         const useforeignKey = foreignKey || snakeCase(this._parentTable.name) + "_id";
         return target.where(<any> {[useforeignKey]: this.id});
     }

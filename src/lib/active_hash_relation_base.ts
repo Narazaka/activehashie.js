@@ -2,59 +2,37 @@ import intersection = require("lodash.intersection");
 import difference = require("lodash.difference");
 import {ActiveHash, Contitions} from "./active_hash";
 import {ActiveHashRecord} from "./active_hash_record";
+import {ActiveHashRelationEager} from "./active_hash_relation_eager";
+import {ActiveHashRelationLazy} from "./active_hash_relation_lazy";
 import {Queryable} from "./queryable";
 import {RecordNotFound} from "./record_not_found";
 
-export class ActiveHashRelation<Record extends ActiveHashRecord> implements Queryable<Record> {
-    private source: ActiveHash<Record>;
-    private filters: Array<(source: ActiveHash<Record>, filteredIndexes: number[]) => number[]>;
+export abstract class ActiveHashRelationBase<Record extends ActiveHashRecord> implements Queryable<Record> {
+    protected source: ActiveHash<Record>;
 
     get name() {
         return this.source.name;
     }
 
-    constructor(
-        source: ActiveHash<Record>,
-        filters: Array<(source: ActiveHash<Record>, filteredIndexes: number[]) => number[]> = [],
-    ) {
+    constructor(source: ActiveHash<Record>) {
         this.source = source;
-        this.filters = filters;
     }
 
-    all() {
-        return new ActiveHashRelation(this.source, this.filters);
-    }
+    abstract all(): ActiveHashRelationBase<Record>;
 
-    where(conditions?: Contitions<Record>) {
-        if (!conditions) return this.all();
-        const finder = (source: ActiveHash<Record>, filteredIndexes: number[]) => {
-            const {indexes, restConditions} = this.filterByIndex(source, filteredIndexes, conditions);
-            return this.filterByMatch(source, indexes, restConditions);
-        };
-        return new ActiveHashRelation(this.source, this.filters.concat([finder]));
-    }
+    abstract eager(): ActiveHashRelationEager<Record>;
 
-    not(conditions: Contitions<Record>) {
-        const finder = (source: ActiveHash<Record>, filteredIndexes: number[]) => {
-            const {indexes, restConditions} = this.filterByIndex(source, filteredIndexes, conditions, true);
-            return this.filterByMatch(source, indexes, restConditions, true);
-        };
-        return new ActiveHashRelation(this.source, this.filters.concat([finder]));
-    }
+    abstract lazy(): ActiveHashRelationLazy<Record>;
 
-    filter(callback: (record: Record) => boolean) {
-        const finder = (source: ActiveHash<Record>, filteredIndexes: number[]) => {
-            return filteredIndexes.filter((index) => callback(source.data[index]));
-        };
-        return new ActiveHashRelation(this.source, this.filters.concat([finder]));
-    }
+    abstract where(conditions?: Contitions<Record>): ActiveHashRelationBase<Record>;
 
-    filterByColumn<Column extends keyof Record>(column: Column, callback: (value: Record[Column]) => boolean) {
-        const finder = (source: ActiveHash<Record>, filteredIndexes: number[]) => {
-            return filteredIndexes.filter((index) => callback(source.data[index][column]));
-        };
-        return new ActiveHashRelation(this.source, this.filters.concat([finder]));
-    }
+    abstract not(conditions: Contitions<Record>): ActiveHashRelationBase<Record>;
+
+    abstract filter(callback: (record: Record) => boolean): ActiveHashRelationBase<Record>;
+
+    abstract filterByColumn<Column extends keyof Record>(
+        column: Column, callback: (value: Record[Column]) => boolean,
+    ): ActiveHashRelationBase<Record>;
 
     find_by(conditions: Contitions<Record>): Record | undefined {
         return this.where(conditions).toArray()[0];
@@ -73,9 +51,7 @@ export class ActiveHashRelation<Record extends ActiveHashRecord> implements Quer
         return this.toArray().length;
     }
 
-    toArray() {
-        return this.filteredIndexes().map((index) => this.source.data[index]);
-    }
+    abstract toArray(): Record[];
 
     pluck<Column extends keyof Record>(column: Column): Array<Record[Column]>;
     pluck(...columns: Array<keyof Record>): Array<Array<Record[keyof Record]>>;
@@ -88,12 +64,32 @@ export class ActiveHashRelation<Record extends ActiveHashRecord> implements Quer
         }
     }
 
-    private filteredIndexes() {
-        const indexes = this.filters.reduce(
-            (filteredIndexes, filter) => filter(this.source, filteredIndexes),
-            Array.from(Array(this.source.data.length).keys()),
-        );
-        return indexes.sort();
+    protected buildWhereFilder(conditions: Contitions<Record>) {
+        return (source: ActiveHash<Record>, filteredIndexes: number[]) => {
+            const {indexes, restConditions} = this.filterByIndex(source, filteredIndexes, conditions);
+            return this.filterByMatch(source, indexes, restConditions);
+        };
+    }
+
+    protected buildNotFinder(conditions: Contitions<Record>) {
+        return (source: ActiveHash<Record>, filteredIndexes: number[]) => {
+            const {indexes, restConditions} = this.filterByIndex(source, filteredIndexes, conditions, true);
+            return this.filterByMatch(source, indexes, restConditions, true);
+        };
+    }
+
+    protected buildFilterFinder(callback: (record: Record) => boolean) {
+        return (source: ActiveHash<Record>, filteredIndexes: number[]) => {
+            return filteredIndexes.filter((index) => callback(source.data[index]));
+        };
+    }
+
+    protected buildFilterByColumnFinder<Column extends keyof Record>(
+        column: Column, callback: (value: Record[Column]) => boolean,
+    ) {
+        return (source: ActiveHash<Record>, filteredIndexes: number[]) => {
+            return filteredIndexes.filter((index) => callback(source.data[index][column]));
+        };
     }
 
     private filterByIndex(

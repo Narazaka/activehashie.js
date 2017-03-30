@@ -1,5 +1,5 @@
-import {ActiveHashRecord, ActiveHashRelation} from "../../lib";
+import {ActiveHashRecord, ActiveHashRelationBase} from "../../lib";
 
-export function toId<Record extends ActiveHashRecord>(relation: ActiveHashRelation<Record>) {
+export function toId<Record extends ActiveHashRecord>(relation: ActiveHashRelationBase<Record>) {
     return relation.toArray().map((record) => record.id);
 }

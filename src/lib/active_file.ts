@@ -1,6 +1,7 @@
-import {ActiveHash, Contitions} from "./active_hash";
+import {ActiveHash} from "./active_hash";
 import {ActiveHashRecord, ActiveHashRecordBase} from "./active_hash_record";
-import {ActiveHashRelation} from "./active_hash_relation";
+import {ActiveHashRelationEager} from "./active_hash_relation_eager";
+import {ActiveHashRelationLazy} from "./active_hash_relation_lazy";
 import snakeCase = require("lodash.snakecase");
 import * as fs from "fs";
 import * as path from "path";
@@ -84,19 +85,14 @@ export class ActiveFile<Record extends ActiveHashRecord> extends ActiveHash<Reco
         return super.isExists(record);
     }
 
-    all(): ActiveHashRelation<Record> {
+    eager(): ActiveHashRelationEager<Record> {
         if (!this.dataLoaded) this.reload();
-        return super.all();
+        return super.eager();
     }
 
-    where(conditions?: Contitions<Record>) {
+    lazy(): ActiveHashRelationLazy<Record> {
         if (!this.dataLoaded) this.reload();
-        return super.where(conditions);
-    }
-
-    find_by(conditions: Contitions<Record>) {
-        if (!this.dataLoaded) this.reload();
-        return super.find_by(conditions);
+        return super.lazy();
     }
 
     count() {
@@ -104,8 +100,15 @@ export class ActiveFile<Record extends ActiveHashRecord> extends ActiveHash<Reco
         return super.count();
     }
 
-    find(id: any) {
+    toArray() {
         if (!this.dataLoaded) this.reload();
-        return super.find(id);
+        return super.toArray();
+    }
+
+    pluck<Column extends keyof Record>(column: Column): Array<Record[Column]>;
+    pluck(...columns: Array<keyof Record>): Array<Array<Record[keyof Record]>>;
+    pluck(...columns: Array<keyof Record>) {
+        if (!this.dataLoaded) this.reload();
+        return <any> super.pluck(...columns);
     }
 }
