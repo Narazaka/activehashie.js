@@ -61,7 +61,10 @@ export class ActiveHash<Record extends ActiveHashRecord> implements Queryable<Re
         return maxId === -Infinity ? 1 : maxId + 1; // 1つでもidが数値でない場合NaNになる
     }
 
-    searchIndexesByUsingIndex(column: string, values: any[]) {
+    searchIndexesByUsingIndex<Column extends keyof Record>(
+        column: Column,
+        values: Array<Record[Column] | null | undefined>,
+    ) {
         const recordIndex = this.recordIndexes.get(column);
         if (!recordIndex) return;
         return <number[]> values
