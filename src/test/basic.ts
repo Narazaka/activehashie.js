@@ -1,6 +1,6 @@
 /* tslint:disable:variable-name max-classes-per-file */
-import test from "ava";
-import {ActiveHash, ActiveHashRecord} from "../lib";
+import test, {ContextualTestContext} from "ava";
+import {ActiveHash, ActiveHashRecord, Queryable} from "../lib";
 import {toId} from "./util";
 
 class ItemGroupRecord extends ActiveHashRecord {
@@ -32,28 +32,37 @@ ItemGroup.setData([
     new ItemGroupRecord({id: 2, name: "g2"}),
 ]);
 
-test("basic queries", (t) => {
-    t.is(Item.count(), 6);
-    t.is(Item.find(11).name, "n11");
-    t.is(Item.find_by({id: 100}), undefined);
-    t.true(Item.isExists({id: 11}));
-    const id123 = Item.where({id: [13, 12, 11]});
-    t.is(id123.count(), 2);
-    t.deepEqual(id123.pluck("name"), ["n11", "n12"]);
-    t.deepEqual(id123.pluck("id", "name"), [[11, "n11"], [12, "n12"]]);
-    t.deepEqual(Item.pluck("name"), ["n11", "n12", "n21", "n22", "n23", "n31"]);
-    t.deepEqual(
-        Item.pluck("id", "name"),
-        [[11, "n11"], [12, "n12"], [21, "n21"], [22, "n22"], [23, "n23"], [31, "n31"]],
-    );
-    t.deepEqual(toId(id123), [11, 12]);
-    t.deepEqual(toId(Item.all()), [11, 12, 21, 22, 23, 31]);
-    t.deepEqual(toId(Item.where({type: "b"}).where({item_group_id: 2})), [22, 23]);
-    t.deepEqual(toId(Item.where().not({type: "a"})), [22, 23, 31]);
-    t.deepEqual(toId(Item.where().not({id: 11})), [12, 21, 22, 23, 31]);
-    t.deepEqual(toId(Item.where({type: "b"}).filter((record) => record.id < 30)), [22, 23]);
-    t.deepEqual(toId(Item.where({type: "b"}).filterByColumn("id", (id) => id < 30)), [22, 23]);
-});
+function queryTestFor(model: Queryable<ItemRecord>) {
+    return (t: ContextualTestContext) => {
+        t.is(model.count(), 6);
+        t.is(model.find(11).name, "n11");
+        t.is(model.find_by({id: 100}), undefined);
+        if (model instanceof ActiveHash) t.true(model.isExists({id: 11}));
+        const id123 = model.where({id: [13, 12, 11]});
+        t.is(id123.count(), 2);
+        t.deepEqual(id123.pluck("name"), ["n11", "n12"]);
+        t.deepEqual(id123.pluck("id", "name"), [[11, "n11"], [12, "n12"]]);
+        t.deepEqual(model.pluck("name"), ["n11", "n12", "n21", "n22", "n23", "n31"]);
+        t.deepEqual(
+            model.pluck("id", "name"),
+            [[11, "n11"], [12, "n12"], [21, "n21"], [22, "n22"], [23, "n23"], [31, "n31"]],
+        );
+        t.deepEqual(toId(id123), [11, 12]);
+        t.deepEqual(toId(model.all()), [11, 12, 21, 22, 23, 31]);
+        t.deepEqual(model.all(), model.where());
+        t.deepEqual(toId(model.where({type: "b"}).where({item_group_id: 2})), [22, 23]);
+        t.deepEqual(toId(model.not({type: "a"})), [22, 23, 31]);
+        t.deepEqual(toId(model.not({id: 11})), [12, 21, 22, 23, 31]);
+        t.deepEqual(toId(model.filter((record) => record.id > 30)), [31]);
+        t.deepEqual(toId(model.filterByColumn("id", (id) => id > 30)), [31]);
+        t.deepEqual(toId(model.where({type: "b"}).filter((record) => record.id < 30)), [22, 23]);
+        t.deepEqual(toId(model.where({type: "b"}).filterByColumn("id", (id) => id < 30)), [22, 23]);
+    };
+}
+
+test("basic queries for ActiveHash", queryTestFor(Item));
+test("basic queries for eager", queryTestFor(Item.eager()));
+test("basic queries for lazy", queryTestFor(Item.lazy()));
 
 test("associations", (t) => {
     const item11 = Item.find(11);
