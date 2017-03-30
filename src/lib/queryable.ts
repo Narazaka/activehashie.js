@@ -21,3 +21,23 @@ export interface Queryable<Record extends ActiveHashRecord> {
     pluck<Column extends keyof Record>(column: Column): Array<Record[Column]>;
     pluck(...columns: Array<keyof Record>): Array<Array<Record[keyof Record]>>;
 }
+
+export interface ActiveHashRelationByEvaluation<Record extends ActiveHashRecord> {
+    eager: ActiveHashRelationEager<Record>;
+    lazy: ActiveHashRelationLazy<Record>;
+};
+
+export interface QueryableByEvaluation<
+    Record extends ActiveHashRecord,
+    Evaluation extends keyof ActiveHashRelationByEvaluation<Record>
+> extends Queryable<Record> {
+    all(): ActiveHashRelationByEvaluation<Record>[Evaluation];
+    where(conditions?: Contitions<Record>): ActiveHashRelationByEvaluation<Record>[Evaluation];
+    not(conditions: Contitions<Record>): ActiveHashRelationByEvaluation<Record>[Evaluation];
+    filter(callback: (record: Record) => boolean): ActiveHashRelationByEvaluation<Record>[Evaluation];
+    filterByColumn<Column extends keyof Record>(column: Column, callback: (value: Record[Column]) => boolean):
+        ActiveHashRelationByEvaluation<Record>[Evaluation];
+};
+
+export interface EagerQueryable<Record extends ActiveHashRecord> extends QueryableByEvaluation<Record, "eager"> { }
+export interface LazyQueryable<Record extends ActiveHashRecord> extends QueryableByEvaluation<Record, "lazy"> { }

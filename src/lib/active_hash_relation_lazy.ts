@@ -2,8 +2,12 @@ import {ActiveHash, Contitions} from "./active_hash";
 import {ActiveHashRecord} from "./active_hash_record";
 import {ActiveHashRelationBase} from "./active_hash_relation_base";
 import {ActiveHashRelationEager} from "./active_hash_relation_eager";
+import {LazyQueryable} from "./queryable";
 
-export class ActiveHashRelationLazy<Record extends ActiveHashRecord> extends ActiveHashRelationBase<Record> {
+export class ActiveHashRelationLazy<Record extends ActiveHashRecord>
+    extends ActiveHashRelationBase<Record>
+    implements LazyQueryable<Record>
+{
     private filters: Array<(source: ActiveHash<Record>, filteredIndexes: number[]) => number[]>;
 
     constructor(
