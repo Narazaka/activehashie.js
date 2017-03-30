@@ -76,6 +76,14 @@ export class ActiveHash<Record extends ActiveHashRecord> implements Queryable<Re
         return this.all().where(conditions);
     }
 
+    filter(callback: (record: Record) => boolean) {
+        return this.all().filter(callback);
+    }
+
+    filterColumn<Column extends keyof Record>(column: Column, callback: (value: Record[Column]) => boolean) {
+        return this.all().filterColumn(column, callback);
+    }
+
     find_by(conditions: Contitions<Record>) {
         return this.all().find_by(conditions);
     }

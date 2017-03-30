@@ -51,6 +51,8 @@ test("basic queries", (t) => {
     t.deepEqual(toId(Item.where({type: "b"}).where({item_group_id: 2})), [22, 23]);
     t.deepEqual(toId(Item.where().not({type: "a"})), [22, 23, 31]);
     t.deepEqual(toId(Item.where().not({id: 11})), [12, 21, 22, 23, 31]);
+    t.deepEqual(toId(Item.where({type: "b"}).filter((record) => record.id < 30)), [22, 23]);
+    t.deepEqual(toId(Item.where({type: "b"}).filterColumn("id", (id) => id < 30)), [22, 23]);
 });
 
 test("associations", (t) => {
