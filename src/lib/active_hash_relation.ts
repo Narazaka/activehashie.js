@@ -9,6 +9,10 @@ export class ActiveHashRelation<Record extends ActiveHashRecord> implements Quer
     private source: ActiveHash<Record>;
     private filters: Array<(source: ActiveHash<Record>, filteredIndexes: number[]) => number[]>;
 
+    get name() {
+        return this.source.name;
+    }
+
     constructor(
         source: ActiveHash<Record>,
         filters: Array<(source: ActiveHash<Record>, filteredIndexes: number[]) => number[]> = [],
