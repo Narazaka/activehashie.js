@@ -2,9 +2,10 @@ import intersection = require("lodash.intersection");
 import difference = require("lodash.difference");
 import {ActiveHash, Contitions} from "./active_hash";
 import {ActiveHashRecord} from "./active_hash_record";
+import {Queryable} from "./queryable";
 import {RecordNotFound} from "./record_not_found";
 
-export class ActiveHashRelation<Record extends ActiveHashRecord> {
+export class ActiveHashRelation<Record extends ActiveHashRecord> implements Queryable<Record> {
     private source: ActiveHash<Record>;
     private filters: Array<(source: ActiveHash<Record>, filteredIndexes: number[]) => number[]>;
 

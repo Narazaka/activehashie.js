@@ -1,5 +1,6 @@
 import {ActiveHashRecord, ActiveHashRecordBase} from "./active_hash_record";
 import {ActiveHashRelation} from "./active_hash_relation";
+import {Queryable} from "./queryable";
 
 type RecordIndex = Map<any, number[]>;
 
@@ -7,7 +8,7 @@ export type Contitions<Record extends ActiveHashRecord> = {
     [column in keyof Record]?: Record[column] | Array<Record[column]> | null | undefined;
 };
 
-export class ActiveHash<Record extends ActiveHashRecord> {
+export class ActiveHash<Record extends ActiveHashRecord> implements Queryable<Record> {
     /** table name */
     readonly name: string;
     /** record class */
