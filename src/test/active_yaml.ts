@@ -78,12 +78,12 @@ test.after(() => {
 });
 
 test("from single file", (t) => {
-    t.is(ItemGroup.count(), 2);
+    t.is(ItemGroup.length, 2);
     t.deepEqual(toId(ItemGroup.all()), [1, 2]);
 });
 
 test("from multiple files", (t) => {
-    t.is(Item.count(), 4);
+    t.is(Item.length, 4);
     t.deepEqual(toId(Item.all()), [11, 12, 21, 22]);
     fs.unlinkSync(fromCwd("items/data2.yml"));
     Item.reload();

@@ -47,9 +47,7 @@ export abstract class ActiveHashRelationBase<Record extends ActiveHashRecord> im
         }
     }
 
-    count() {
-        return this.toArray().length;
-    }
+    abstract get length(): number;
 
     abstract toArray(): Record[];
 

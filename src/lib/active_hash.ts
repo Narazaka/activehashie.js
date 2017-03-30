@@ -108,7 +108,7 @@ export class ActiveHash<Record extends ActiveHashRecord> implements EagerQueryab
         return this.all().find(id);
     }
 
-    count() {
+    get length() {
         return this.data.length;
     }
 

@@ -50,6 +50,10 @@ export class ActiveHashRelationLazy<Record extends ActiveHashRecord>
         );
     }
 
+    get length() {
+        return this.filteredIndexes().length;
+    }
+
     toArray() {
         return this.filteredIndexes().map((index) => this.source.data[index]);
     }

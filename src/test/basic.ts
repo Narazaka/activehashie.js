@@ -34,12 +34,12 @@ ItemGroup.setData([
 
 function queryTestFor(model: Queryable<ItemRecord>) {
     return (t: ContextualTestContext) => {
-        t.is(model.count(), 6);
+        t.is(model.length, 6);
         t.is(model.find(11).name, "n11");
         t.is(model.find_by({id: 100}), undefined);
         if (model instanceof ActiveHash) t.true(model.isExists({id: 11}));
         const id123 = model.where({id: [13, 12, 11]});
-        t.is(id123.count(), 2);
+        t.is(id123.length, 2);
         t.deepEqual(id123.pluck("name"), ["n11", "n12"]);
         t.deepEqual(id123.pluck("id", "name"), [[11, "n11"], [12, "n12"]]);
         t.deepEqual(model.pluck("name"), ["n11", "n12", "n21", "n22", "n23", "n31"]);

@@ -95,9 +95,9 @@ export class ActiveFile<Record extends ActiveHashRecord> extends ActiveHash<Reco
         return super.lazy();
     }
 
-    count() {
+    get length() {
         if (!this.dataLoaded) this.reload();
-        return super.count();
+        return super.length;
     }
 
     toArray() {

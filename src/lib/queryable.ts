@@ -6,6 +6,7 @@ import {ActiveHashRelationLazy} from "./active_hash_relation_lazy";
 
 export interface Queryable<Record extends ActiveHashRecord> {
     name: string;
+    length: number;
     all(): ActiveHashRelationBase<Record>;
     eager(): ActiveHashRelationEager<Record>;
     lazy(): ActiveHashRelationLazy<Record>;
@@ -16,7 +17,6 @@ export interface Queryable<Record extends ActiveHashRecord> {
         ActiveHashRelationBase<Record>;
     find_by(conditions: Contitions<Record>): Record | undefined;
     find(id: any): Record;
-    count(): number;
     toArray(): Record[];
     pluck<Column extends keyof Record>(column: Column): Array<Record[Column]>;
     pluck(...columns: Array<keyof Record>): Array<Array<Record[keyof Record]>>;
