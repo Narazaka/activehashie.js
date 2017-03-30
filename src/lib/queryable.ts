@@ -9,4 +9,7 @@ export interface Queryable<Record extends ActiveHashRecord> {
     find_by(conditions: Contitions<Record>): Record | undefined;
     find(id: any): Record;
     count(): number;
+    toArray(): Record[];
+    pluck<Column extends keyof Record>(column: Column): Array<Record[Column]>;
+    pluck(...columns: Array<keyof Record>): Array<Array<Record[keyof Record]>>;
 }

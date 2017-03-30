@@ -64,6 +64,17 @@ export class ActiveHashRelation<Record extends ActiveHashRecord> implements Quer
         return this.filteredIndexes().map((index) => this.source.data[index]);
     }
 
+    pluck<Column extends keyof Record>(column: Column): Array<Record[Column]>;
+    pluck(...columns: Array<keyof Record>): Array<Array<Record[keyof Record]>>;
+    pluck(...columns: Array<keyof Record>) {
+        if (columns.length === 1) {
+            const column = columns[0];
+            return <any> this.toArray().map((record) => record[column]);
+        } else {
+            return this.toArray().map((record) => columns.map((column) => record[column]));
+        }
+    }
+
     private filteredIndexes() {
         const indexes = this.filters.reduce(
             (filteredIndexes, filter) => filter(this.source, filteredIndexes),

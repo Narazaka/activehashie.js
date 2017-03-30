@@ -88,6 +88,21 @@ export class ActiveHash<Record extends ActiveHashRecord> implements Queryable<Re
         return this.data.length;
     }
 
+    toArray() {
+        return this.data;
+    }
+
+    pluck<Column extends keyof Record>(column: Column): Array<Record[Column]>;
+    pluck(...columns: Array<keyof Record>): Array<Array<Record[keyof Record]>>;
+    pluck(...columns: Array<keyof Record>) {
+        if (columns.length === 1) {
+            const column = columns[0];
+            return <any> this.toArray().map((record) => record[column]);
+        } else {
+            return this.toArray().map((record) => columns.map((column) => record[column]));
+        }
+    }
+
     private addToRecordIndex(records: Record[], minIndex: number) {
         for (const indexColumn of this.indexColumns) {
             const recordIndex = <RecordIndex> this.recordIndexes.get(indexColumn);

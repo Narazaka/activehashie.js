@@ -39,6 +39,13 @@ test("basic queries", (t) => {
     t.true(Item.isExists({id: 11}));
     const id123 = Item.where({id: [13, 12, 11]});
     t.is(id123.count(), 2);
+    t.deepEqual(id123.pluck("name"), ["n11", "n12"]);
+    t.deepEqual(id123.pluck("id", "name"), [[11, "n11"], [12, "n12"]]);
+    t.deepEqual(Item.pluck("name"), ["n11", "n12", "n21", "n22", "n23", "n31"]);
+    t.deepEqual(
+        Item.pluck("id", "name"),
+        [[11, "n11"], [12, "n12"], [21, "n21"], [22, "n22"], [23, "n23"], [31, "n31"]],
+    );
     t.deepEqual(toId(id123), [11, 12]);
     t.deepEqual(toId(Item.all()), [11, 12, 21, 22, 23, 31]);
     t.deepEqual(toId(Item.where({type: "b"}).where({item_group_id: 2})), [22, 23]);
