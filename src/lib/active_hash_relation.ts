@@ -35,7 +35,6 @@ export class ActiveHashRelation<Record extends ActiveHashRecord> implements Quer
     }
 
     not(conditions: Contitions<Record>) {
-        if (!conditions) return this.all();
         const finder = (source: ActiveHash<Record>, filteredIndexes: number[]) => {
             const {indexes, restConditions} = this.filterByIndex(source, filteredIndexes, conditions, true);
             return this.filterByMatch(source, indexes, restConditions, true);
