@@ -7,7 +7,7 @@ export interface Queryable<Record extends ActiveHashRecord> {
     all(): ActiveHashRelation<Record>;
     where(conditions?: Contitions<Record>): ActiveHashRelation<Record>;
     filter(callback: (record: Record) => boolean): ActiveHashRelation<Record>;
-    filterColumn<Column extends keyof Record>(column: Column, callback: (value: Record[Column]) => boolean):
+    filterByColumn<Column extends keyof Record>(column: Column, callback: (value: Record[Column]) => boolean):
         ActiveHashRelation<Record>;
     find_by(conditions: Contitions<Record>): Record | undefined;
     find(id: any): Record;

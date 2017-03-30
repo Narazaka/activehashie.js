@@ -49,7 +49,7 @@ export class ActiveHashRelation<Record extends ActiveHashRecord> implements Quer
         return new ActiveHashRelation(this.source, this.filters.concat([finder]));
     }
 
-    filterColumn<Column extends keyof Record>(column: Column, callback: (value: Record[Column]) => boolean) {
+    filterByColumn<Column extends keyof Record>(column: Column, callback: (value: Record[Column]) => boolean) {
         const finder = (source: ActiveHash<Record>, filteredIndexes: number[]) => {
             return filteredIndexes.filter((index) => callback(source.data[index][column]));
         };
