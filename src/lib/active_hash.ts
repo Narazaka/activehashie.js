@@ -96,8 +96,8 @@ export class ActiveHash<Record extends ActiveHashRecord> implements EagerQueryab
         return this.all().filterByColumn(column, callback);
     }
 
-    find_by(conditions: Contitions<Record>) {
-        return this.all().find_by(conditions);
+    findBy(conditions: Contitions<Record>) {
+        return this.all().findBy(conditions);
     }
 
     find(id: any) {

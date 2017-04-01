@@ -36,7 +36,7 @@ function queryTestFor(model: Queryable<ItemRecord>) {
     return (t: ContextualTestContext) => {
         t.is(model.length, 6);
         t.is(model.find(11).name, "n11");
-        t.is(model.find_by({id: 100}), undefined);
+        t.is(model.findBy({id: 100}), undefined);
         if (model instanceof ActiveHash) t.true(model.isExists({id: 11}));
         const id123 = model.where({id: [13, 12, 11]});
         t.is(id123.length, 2);

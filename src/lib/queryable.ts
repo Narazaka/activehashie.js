@@ -9,6 +9,9 @@ export type Contitions<Record extends ActiveHashRecord> = {
 export type ActiveHashRecordFilter<Record extends ActiveHashRecord> = (record: Record) => boolean;
 export type ActiveHashRecordValueFilter<Record extends ActiveHashRecord, Column extends keyof Record> =
     (value: Record[Column]) => boolean;
+export type ActiveHashRecordMapper<Record extends ActiveHashRecord, Result> = (record: Record) => Result;
+export type ActiveHashRecordValueMapper<Record extends ActiveHashRecord, Column extends keyof Record, Result> =
+    (value: Record[Column]) => Result;
 
 export interface Queryable<Record extends ActiveHashRecord> {
     name: string;
@@ -21,7 +24,7 @@ export interface Queryable<Record extends ActiveHashRecord> {
     filter(callback: ActiveHashRecordFilter<Record>): ActiveHashRelationBase<Record>;
     filterByColumn<Column extends keyof Record>(column: Column, callback: ActiveHashRecordValueFilter<Record, Column>):
         ActiveHashRelationBase<Record>;
-    find_by(conditions: Contitions<Record>): Record | undefined;
+    findBy(conditions: Contitions<Record>): Record | undefined;
     find(id: any): Record;
     toArray(): Record[];
     pluck<Column extends keyof Record>(column: Column): Array<Record[Column]>;

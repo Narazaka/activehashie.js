@@ -21,7 +21,7 @@ export class ActiveHashRecord implements ActiveHashRecordBase {
         target: ActiveHash<Record>, foreignKey?: keyof Record,
     ) {
         const useforeignKey = foreignKey || snakeCase(this._parentTable.name) + "_id";
-        return target.find_by(<any> {[useforeignKey]: this.id});
+        return target.findBy(<any> {[useforeignKey]: this.id});
     }
 
     protected belongsTo<Record extends ActiveHashRecord>(
@@ -29,7 +29,7 @@ export class ActiveHashRecord implements ActiveHashRecordBase {
     ) {
         const useforeignKey = foreignKey || snakeCase(target.name) + "_id";
         const id = (<any> this)[useforeignKey];
-        return target.find_by(<any> {id});
+        return target.findBy(<any> {id});
     }
 };
 

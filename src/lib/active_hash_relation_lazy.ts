@@ -2,7 +2,14 @@ import {ActiveHash} from "./active_hash";
 import {ActiveHashRecord} from "./active_hash_record";
 import {ActiveHashRelationBase} from "./active_hash_relation_base";
 import {ActiveHashRelationEager} from "./active_hash_relation_eager";
-import {ActiveHashRecordFilter, ActiveHashRecordValueFilter, Contitions, LazyQueryable} from "./queryable";
+import {
+    ActiveHashRecordFilter,
+    ActiveHashRecordMapper,
+    ActiveHashRecordValueFilter,
+    ActiveHashRecordValueMapper,
+    Contitions,
+    LazyQueryable,
+} from "./queryable";
 
 export class ActiveHashRelationLazy<Record extends ActiveHashRecord>
     extends ActiveHashRelationBase<Record>
@@ -22,7 +29,7 @@ export class ActiveHashRelationLazy<Record extends ActiveHashRecord>
     }
 
     eager() {
-        return new ActiveHashRelationEager(this.source, this.filteredIndexes());
+        return new ActiveHashRelationEager(this.source, this.filteredIndexes);
     }
 
     lazy() {
@@ -38,6 +45,39 @@ export class ActiveHashRelationLazy<Record extends ActiveHashRecord>
         return new ActiveHashRelationLazy(this.source, this.filters.concat([this.buildNotFinder(conditions)]));
     }
 
+    group<Column extends keyof Record>(column: Column) {
+        const indexGroups = this.buildIndexGroups(column);
+        const groups: Map<Record[Column], ActiveHashRelationLazy<Record>> = new Map();
+        for (const [value, indexes] of indexGroups.entries()) {
+            groups.set(value, new ActiveHashRelationLazy(this.source, [() => indexes]));
+        }
+        return groups;
+    }
+
+    groupBy<Result>(callback: ActiveHashRecordMapper<Record, Result>) {
+        const indexGroups = this.buildIndexGroupsBy(callback);
+        const groups: Map<Result, ActiveHashRelationLazy<Record>> = new Map();
+        for (const [value, indexes] of indexGroups.entries()) {
+            groups.set(value, new ActiveHashRelationLazy(this.source, [() => indexes]));
+        }
+        return groups;
+    }
+
+    groupByColumn<Column extends keyof Record, Result>(
+        column: Column, callback: ActiveHashRecordValueMapper<Record, Column, Result>,
+    ) {
+        const indexGroups = this.buildIndexGroupsByColumn(column, callback);
+        const groups: Map<Result, ActiveHashRelationLazy<Record>> = new Map();
+        for (const [value, indexes] of indexGroups.entries()) {
+            groups.set(value, new ActiveHashRelationLazy(this.source, [() => indexes]));
+        }
+        return groups;
+    }
+
+    none() {
+        return new ActiveHashRelationLazy(this.source, [() => []]);
+    }
+
     filter(callback: ActiveHashRecordFilter<Record>) {
         return new ActiveHashRelationLazy(this.source, this.filters.concat([this.buildFilterFinder(callback)]));
     }
@@ -49,15 +89,7 @@ export class ActiveHashRelationLazy<Record extends ActiveHashRecord>
         );
     }
 
-    get length() {
-        return this.filteredIndexes().length;
-    }
-
-    toArray() {
-        return this.filteredIndexes().map((index) => this.source.data[index]);
-    }
-
-    private filteredIndexes() {
+    protected get filteredIndexes() {
         const indexes = this.filters.reduce(
             (filteredIndexes, filter) => filter(this.source, filteredIndexes),
             Array.from(Array(this.source.data.length).keys()),

@@ -4,11 +4,19 @@ import {ActiveHash} from "./active_hash";
 import {ActiveHashRecord} from "./active_hash_record";
 import {ActiveHashRelationEager} from "./active_hash_relation_eager";
 import {ActiveHashRelationLazy} from "./active_hash_relation_lazy";
-import {ActiveHashRecordFilter, ActiveHashRecordValueFilter, Contitions, Queryable} from "./queryable";
+import {
+    ActiveHashRecordFilter,
+    ActiveHashRecordMapper,
+    ActiveHashRecordValueFilter,
+    ActiveHashRecordValueMapper,
+    Contitions,
+    Queryable,
+} from "./queryable";
 import {RecordNotFound} from "./record_not_found";
 
 export abstract class ActiveHashRelationBase<Record extends ActiveHashRecord> implements Queryable<Record> {
     protected source: ActiveHash<Record>;
+    protected filteredIndexes: number[];
 
     get name() {
         return this.source.name;
@@ -28,18 +36,30 @@ export abstract class ActiveHashRelationBase<Record extends ActiveHashRecord> im
 
     abstract not(conditions: Contitions<Record>): ActiveHashRelationBase<Record>;
 
+    abstract group<Column extends keyof Record>(column: Column): Map<Record[Column], ActiveHashRelationBase<Record>>;
+
+    abstract groupBy<Result>(
+        callback: ActiveHashRecordMapper<Record, Result>,
+    ): Map<Result, ActiveHashRelationBase<Record>>;
+
+    abstract groupByColumn<Column extends keyof Record, Result>(
+        column: Column, callback: ActiveHashRecordValueMapper<Record, Column, Result>,
+    ): Map<Result, ActiveHashRelationBase<Record>>;
+
+    abstract none(): ActiveHashRelationBase<Record>;
+
     abstract filter(callback: ActiveHashRecordFilter<Record>): ActiveHashRelationBase<Record>;
 
     abstract filterByColumn<Column extends keyof Record>(
         column: Column, callback: ActiveHashRecordValueFilter<Record, Column>,
     ): ActiveHashRelationBase<Record>;
 
-    find_by(conditions: Contitions<Record>): Record | undefined {
+    findBy(conditions: Contitions<Record>): Record | undefined {
         return this.where(conditions).toArray()[0];
     }
 
     find(id: any) {
-        const record = this.find_by(<any> {id});
+        const record = this.findBy(<any> {id});
         if (record) {
             return record;
         } else {
@@ -47,9 +67,13 @@ export abstract class ActiveHashRelationBase<Record extends ActiveHashRecord> im
         }
     }
 
-    abstract get length(): number;
+    get length() {
+        return this.filteredIndexes.length;
+    }
 
-    abstract toArray(): Record[];
+    toArray() {
+        return this.filteredIndexes.map((index) => this.source.data[index]);
+    }
 
     pluck<Column extends keyof Record>(column: Column): Array<Record[Column]>;
     pluck(...columns: Array<keyof Record>): Array<Array<Record[keyof Record]>>;
@@ -88,6 +112,51 @@ export abstract class ActiveHashRelationBase<Record extends ActiveHashRecord> im
         return (source: ActiveHash<Record>, filteredIndexes: number[]) => {
             return filteredIndexes.filter((index) => callback(source.data[index][column]));
         };
+    }
+
+    protected buildIndexGroups<Column extends keyof Record>(column: Column) {
+        const indexGroups: Map<Record[Column], number[]> = new Map();
+        for (const index of this.filteredIndexes) {
+            const value = this.source.data[index][column];
+            let indexGroup = indexGroups.get(value);
+            if (!indexGroup) {
+                indexGroup = [];
+                indexGroups.set(value, indexGroup);
+            }
+            indexGroup.push(index);
+        }
+        return indexGroups;
+    }
+
+    protected buildIndexGroupsBy<Result>(callback: ActiveHashRecordMapper<Record, Result>) {
+        const indexGroups: Map<Result, number[]> = new Map();
+        for (const index of this.filteredIndexes) {
+            const value = callback(this.source.data[index]);
+            let indexGroup = indexGroups.get(value);
+            if (!indexGroup) {
+                indexGroup = [];
+                indexGroups.set(value, indexGroup);
+            }
+            indexGroup.push(index);
+        }
+        return indexGroups;
+    }
+
+    protected buildIndexGroupsByColumn<Column extends keyof Record, Result>(
+        column: Column,
+        callback: ActiveHashRecordValueMapper<Record, Column, Result>,
+    ) {
+        const indexGroups: Map<Result, number[]> = new Map();
+        for (const index of this.filteredIndexes) {
+            const value = callback(this.source.data[index][column]);
+            let indexGroup = indexGroups.get(value);
+            if (!indexGroup) {
+                indexGroup = [];
+                indexGroups.set(value, indexGroup);
+            }
+            indexGroup.push(index);
+        }
+        return indexGroups;
     }
 
     private filterByIndex(
