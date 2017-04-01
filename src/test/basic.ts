@@ -57,6 +57,21 @@ function queryTestFor(model: Queryable<ItemRecord>) {
         t.deepEqual(toId(model.filterByColumn("id", (id) => id > 30)), [31]);
         t.deepEqual(toId(model.where({type: "b"}).filter((record) => record.id < 30)), [22, 23]);
         t.deepEqual(toId(model.where({type: "b"}).filterByColumn("id", (id) => id < 30)), [22, 23]);
+        t.deepEqual(
+            Array.from(model.group("type").values()).map((records) => records.toArray()),
+            [model.where({type: "a"}).toArray(), model.where({type: "b"}).toArray()],
+        );
+        t.deepEqual(
+            Array.from(model.groupBy((record: ItemRecord) => Math.floor(record.id / 10)).values())
+                .map((records) => records.pluck("id")),
+            [[11, 12], [21, 22, 23], [31]],
+        );
+        t.deepEqual(
+            Array.from(model.groupByColumn("item_group_id", (item_group_id: number) => item_group_id > 1).values())
+                .map((records) => records.pluck("id")),
+            [[11, 12], [21, 22, 23, 31]],
+        );
+        t.deepEqual(model.none().pluck("id"), []);
     };
 }
 
