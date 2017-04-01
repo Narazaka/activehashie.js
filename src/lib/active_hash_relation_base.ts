@@ -16,7 +16,7 @@ import {RecordNotFound} from "./record_not_found";
 
 export abstract class ActiveHashRelationBase<Record extends ActiveHashRecord> implements Queryable<Record> {
     protected source: ActiveHash<Record>;
-    protected filteredIndexes: number[];
+    protected readonly abstract filteredIndexes: number[];
 
     get name() {
         return this.source.name;

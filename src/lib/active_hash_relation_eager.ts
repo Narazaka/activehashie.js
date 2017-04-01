@@ -14,6 +14,8 @@ import {
 export class ActiveHashRelationEager<Record extends ActiveHashRecord>
     extends ActiveHashRelationBase<Record>
     implements EagerQueryable<Record> {
+    protected readonly filteredIndexes: number[];
+
     constructor(
         source: ActiveHash<Record>,
         filteredIndexes: number[] = Array.from(Array(source.data.length).keys()),

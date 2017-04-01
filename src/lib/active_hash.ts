@@ -1,7 +1,14 @@
 import {ActiveHashRecord, ActiveHashRecordBase} from "./active_hash_record";
 import {ActiveHashRelationEager} from "./active_hash_relation_eager";
 import {ActiveHashRelationLazy} from "./active_hash_relation_lazy";
-import {ActiveHashRecordFilter, ActiveHashRecordValueFilter, Contitions, EagerQueryable} from "./queryable";
+import {
+    ActiveHashRecordFilter,
+    ActiveHashRecordMapper,
+    ActiveHashRecordValueFilter,
+    ActiveHashRecordValueMapper,
+    Contitions,
+    EagerQueryable,
+} from "./queryable";
 
 type RecordIndex = Map<any, number[]>;
 
@@ -86,6 +93,24 @@ export class ActiveHash<Record extends ActiveHashRecord> implements EagerQueryab
 
     not(conditions: Contitions<Record>) {
         return this.all().not(conditions);
+    }
+
+    group<Column extends keyof Record>(column: Column) {
+        return this.all().group(column);
+    }
+
+    groupBy<Result>(callback: ActiveHashRecordMapper<Record, Result>) {
+        return this.all().groupBy(callback);
+    }
+
+    groupByColumn<Column extends keyof Record, Result>(
+        column: Column, callback: ActiveHashRecordValueMapper<Record, Column, Result>,
+    ) {
+        return this.all().groupByColumn(column, callback);
+    }
+
+    none() {
+        return this.all().none();
     }
 
     filter(callback: ActiveHashRecordFilter<Record>) {

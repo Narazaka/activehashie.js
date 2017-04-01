@@ -21,6 +21,14 @@ export interface Queryable<Record extends ActiveHashRecord> {
     lazy(): ActiveHashRelationLazy<Record>;
     where(conditions?: Contitions<Record>): ActiveHashRelationBase<Record>;
     not(conditions: Contitions<Record>): ActiveHashRelationBase<Record>;
+    group<Column extends keyof Record>(column: Column): Map<Record[Column], ActiveHashRelationBase<Record>>;
+    groupBy<Result>(
+        callback: ActiveHashRecordMapper<Record, Result>,
+    ): Map<Result, ActiveHashRelationBase<Record>>;
+    groupByColumn<Column extends keyof Record, Result>(
+        column: Column, callback: ActiveHashRecordValueMapper<Record, Column, Result>,
+    ): Map<Result, ActiveHashRelationBase<Record>>;
+    none(): ActiveHashRelationBase<Record>;
     filter(callback: ActiveHashRecordFilter<Record>): ActiveHashRelationBase<Record>;
     filterByColumn<Column extends keyof Record>(column: Column, callback: ActiveHashRecordValueFilter<Record, Column>):
         ActiveHashRelationBase<Record>;
@@ -43,6 +51,16 @@ export interface QueryableByEvaluation<
     all(): ActiveHashRelationByEvaluation<Record>[Evaluation];
     where(conditions?: Contitions<Record>): ActiveHashRelationByEvaluation<Record>[Evaluation];
     not(conditions: Contitions<Record>): ActiveHashRelationByEvaluation<Record>[Evaluation];
+    group<Column extends keyof Record>(
+        column: Column,
+    ): Map<Record[Column], ActiveHashRelationByEvaluation<Record>[Evaluation]>;
+    groupBy<Result>(
+        callback: ActiveHashRecordMapper<Record, Result>,
+    ): Map<Result, ActiveHashRelationByEvaluation<Record>[Evaluation]>;
+    groupByColumn<Column extends keyof Record, Result>(
+        column: Column, callback: ActiveHashRecordValueMapper<Record, Column, Result>,
+    ): Map<Result, ActiveHashRelationByEvaluation<Record>[Evaluation]>;
+    none(): ActiveHashRelationByEvaluation<Record>[Evaluation];
     filter(callback: ActiveHashRecordFilter<Record>): ActiveHashRelationByEvaluation<Record>[Evaluation];
     filterByColumn<Column extends keyof Record>(column: Column, callback: ActiveHashRecordValueFilter<Record, Column>):
         ActiveHashRelationByEvaluation<Record>[Evaluation];
