@@ -13,22 +13,22 @@ export class ActiveHashRecord implements ActiveHashRecordBase {
     protected hasMany<Record extends ActiveHashRecord>(
         target: ActiveHash<Record>, foreignKey?: keyof Record,
     ): ActiveHashRelationBase<Record> {
-        const useforeignKey = foreignKey || snakeCase(this._parentTable.name) + "_id";
-        return target.where(<any> {[useforeignKey]: this.id});
+        const useForeignKey = foreignKey || snakeCase(this._parentTable.name) + "_id";
+        return target.where(<any> {[useForeignKey]: this.id});
     }
 
     protected hasOne<Record extends ActiveHashRecord>(
         target: ActiveHash<Record>, foreignKey?: keyof Record,
     ) {
-        const useforeignKey = foreignKey || snakeCase(this._parentTable.name) + "_id";
-        return target.findBy(<any> {[useforeignKey]: this.id});
+        const useForeignKey = foreignKey || snakeCase(this._parentTable.name) + "_id";
+        return target.findBy(<any> {[useForeignKey]: this.id});
     }
 
     protected belongsTo<Record extends ActiveHashRecord>(
         target: ActiveHash<Record>, foreignKey?: keyof this,
     ) {
-        const useforeignKey = foreignKey || snakeCase(target.name) + "_id";
-        const id = (<any> this)[useforeignKey];
+        const useForeignKey = foreignKey || snakeCase(target.name) + "_id";
+        const id = (<any> this)[useForeignKey];
         return target.findBy(<any> {id});
     }
 };
