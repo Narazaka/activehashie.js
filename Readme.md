@@ -1,5 +1,7 @@
 # [activehashie.js - The ActiveHash like something](https://github.com/Narazaka/activehashie.js)
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/Narazaka/activehashie.js.svg)](https://greenkeeper.io/)
+
 [![npm](https://img.shields.io/npm/v/activehashie.svg)](https://www.npmjs.com/package/activehashie)
 [![npm license](https://img.shields.io/npm/l/activehashie.svg)](https://www.npmjs.com/package/activehashie)
 [![npm download total](https://img.shields.io/npm/dt/activehashie.svg)](https://www.npmjs.com/package/activehashie)
