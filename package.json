@@ -13,8 +13,9 @@
   "scripts": {
     "dist": "rm -rf dist && tsc",
     "test": "npm run dist && nyc -r html -r text -r lcov ava ./dist/es2015/test/*.js",
-    "lint": "tslint *.ts src/**/*.ts test/**/*.ts",
-    "prepublish": "npm run dist"
+    "lint": "tslint -p .",
+    "prepare": "npm run dist",
+    "prepublishOnly": "npm run lint && npm run test"
   },
   "author": "Narazaka",
   "license": "MIT",
