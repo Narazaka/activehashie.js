@@ -1,5 +1,5 @@
-import intersection = require("lodash.intersection");
 import difference = require("lodash.difference");
+import intersection = require("lodash.intersection");
 import {ActiveHash} from "./active_hash";
 import {ActiveHashRecord} from "./active_hash_record";
 import {ActiveHashRelationEager} from "./active_hash_relation_eager";
@@ -59,7 +59,7 @@ export abstract class ActiveHashRelationBase<Record extends ActiveHashRecord> im
     }
 
     find(id: any) {
-        const record = this.findBy(<any> {id});
+        const record = this.findBy({id} as any);
         if (record) {
             return record;
         } else {
@@ -80,7 +80,7 @@ export abstract class ActiveHashRelationBase<Record extends ActiveHashRecord> im
     pluck(...columns: Array<keyof Record>) {
         if (columns.length === 1) {
             const column = columns[0];
-            return <any> this.toArray().map((record) => record[column]);
+            return this.toArray().map((record) => record[column]) as any;
         } else {
             return this.toArray().map((record) => columns.map((column) => record[column]));
         }
@@ -164,7 +164,7 @@ export abstract class ActiveHashRelationBase<Record extends ActiveHashRecord> im
     ) {
         const filteredIndexesList = [];
         const restConditions: Contitions<Record> = {};
-        for (const column of <Array<keyof Record>> Object.keys(conditions)) {
+        for (const column of Object.keys(conditions) as Array<keyof Record>) {
             const value = conditions[column];
             const indexes = source.searchIndexesByUsingIndex(column, value instanceof Array ? value : [value]);
             if (indexes) {

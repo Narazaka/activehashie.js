@@ -41,7 +41,7 @@ export class ActiveHash<Record extends ActiveHashRecord> implements EagerQueryab
     }
 
     isExists(record: {id: any}) {
-        return (<RecordIndex> this.recordIndexes.get("id")).has(record.id);
+        return (this.recordIndexes.get("id") as RecordIndex).has(record.id);
     }
 
     push(...records: ActiveHashRecordBase[]) {
@@ -59,8 +59,8 @@ export class ActiveHash<Record extends ActiveHashRecord> implements EagerQueryab
     }
 
     nextId() {
-        const recordIndex = <RecordIndex> this.recordIndexes.get("id");
-        const maxId = Math.max(...(<number[]> Array.from(recordIndex.keys())));
+        const recordIndex = this.recordIndexes.get("id") as RecordIndex;
+        const maxId = Math.max(...(Array.from(recordIndex.keys()) as number[]));
         return maxId === -Infinity ? 1 : maxId + 1; // 1つでもidが数値でない場合NaNになる
     }
 
@@ -70,9 +70,9 @@ export class ActiveHash<Record extends ActiveHashRecord> implements EagerQueryab
     ) {
         const recordIndex = this.recordIndexes.get(column);
         if (!recordIndex) return;
-        return <number[]> values
+        return values
             .map((value) => recordIndex.get(value))
-            .reduce((allIndexes, indexes) => (<number[]> allIndexes).concat(indexes || []), []);
+            .reduce((allIndexes, indexes) => (allIndexes as number[]).concat(indexes || []), []) as number[];
     }
 
     all() {
@@ -142,7 +142,7 @@ export class ActiveHash<Record extends ActiveHashRecord> implements EagerQueryab
     pluck(...columns: Array<keyof Record>) {
         if (columns.length === 1) {
             const column = columns[0];
-            return <any> this.toArray().map((record) => record[column]);
+            return this.toArray().map((record) => record[column]) as any;
         } else {
             return this.toArray().map((record) => columns.map((column) => record[column]));
         }
@@ -150,7 +150,7 @@ export class ActiveHash<Record extends ActiveHashRecord> implements EagerQueryab
 
     private addToRecordIndex(records: Record[], minIndex: number) {
         for (const indexColumn of this.indexColumns) {
-            const recordIndex = <RecordIndex> this.recordIndexes.get(indexColumn);
+            const recordIndex = this.recordIndexes.get(indexColumn) as RecordIndex;
             let index = minIndex;
             for (const record of records) {
                 const keyValue = record[indexColumn];

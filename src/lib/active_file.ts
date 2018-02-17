@@ -1,11 +1,11 @@
+import * as fs from "fs";
+import snakeCase = require("lodash.snakecase");
+import * as path from "path";
+import * as pluralize from "pluralize";
 import {ActiveHash} from "./active_hash";
 import {ActiveHashRecord, ActiveHashRecordBase} from "./active_hash_record";
 import {ActiveHashRelationEager} from "./active_hash_relation_eager";
 import {ActiveHashRelationLazy} from "./active_hash_relation_lazy";
-import snakeCase = require("lodash.snakecase");
-import * as fs from "fs";
-import * as path from "path";
-import * as pluralize from "pluralize";
 
 export class ActiveFile<Record extends ActiveHashRecord> extends ActiveHash<Record> {
     readonly filename?: string;
@@ -46,7 +46,7 @@ export class ActiveFile<Record extends ActiveHashRecord> extends ActiveHash<Reco
             if (fileData instanceof Array) {
                 data.push(...fileData);
             } else {
-                data.push(...Object.keys(fileData).map((key) => (<any> fileData)[key]));
+                data.push(...Object.keys(fileData).map((key) => (fileData as any)[key]));
             }
         }
         return data;
@@ -109,6 +109,6 @@ export class ActiveFile<Record extends ActiveHashRecord> extends ActiveHash<Reco
     pluck(...columns: Array<keyof Record>): Array<Array<Record[keyof Record]>>;
     pluck(...columns: Array<keyof Record>) {
         if (!this.dataLoaded) this.reload();
-        return <any> super.pluck(...columns);
+        return super.pluck(...columns) as any;
     }
 }

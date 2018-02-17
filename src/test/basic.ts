@@ -37,7 +37,7 @@ function queryTestFor(model: Queryable<ItemRecord>) {
         t.is(model.length, 6);
         t.is(model.find(11).name, "n11");
         t.throws(() => model.find(100));
-        t.is((<ItemRecord> model.findBy({id: 11})).name, "n11");
+        t.is((model.findBy({id: 11}) as ItemRecord).name, "n11");
         t.is(model.findBy({id: 100}), undefined);
         if (model instanceof ActiveHash) t.true(model.isExists({id: 11}));
         const id123 = model.where({id: [13, 12, 11]});

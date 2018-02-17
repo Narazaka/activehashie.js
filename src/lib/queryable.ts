@@ -42,7 +42,7 @@ export interface Queryable<Record extends ActiveHashRecord> {
 export interface ActiveHashRelationByEvaluation<Record extends ActiveHashRecord> {
     eager: ActiveHashRelationEager<Record>;
     lazy: ActiveHashRelationLazy<Record>;
-};
+}
 
 export interface QueryableByEvaluation<
     Record extends ActiveHashRecord,
@@ -64,7 +64,7 @@ export interface QueryableByEvaluation<
     filter(callback: ActiveHashRecordFilter<Record>): ActiveHashRelationByEvaluation<Record>[Evaluation];
     filterByColumn<Column extends keyof Record>(column: Column, callback: ActiveHashRecordValueFilter<Record, Column>):
         ActiveHashRelationByEvaluation<Record>[Evaluation];
-};
+}
 
 export interface EagerQueryable<Record extends ActiveHashRecord> extends QueryableByEvaluation<Record, "eager"> { }
 export interface LazyQueryable<Record extends ActiveHashRecord> extends QueryableByEvaluation<Record, "lazy"> { }
