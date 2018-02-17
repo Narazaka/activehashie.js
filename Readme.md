@@ -1,18 +1,17 @@
 # [activehashie.js - The ActiveHash like something](https://github.com/Narazaka/activehashie.js)
 
-[![Greenkeeper badge](https://badges.greenkeeper.io/Narazaka/activehashie.js.svg)](https://greenkeeper.io/)
-
 [![npm](https://img.shields.io/npm/v/activehashie.svg)](https://www.npmjs.com/package/activehashie)
 [![npm license](https://img.shields.io/npm/l/activehashie.svg)](https://www.npmjs.com/package/activehashie)
 [![npm download total](https://img.shields.io/npm/dt/activehashie.svg)](https://www.npmjs.com/package/activehashie)
 [![npm download by month](https://img.shields.io/npm/dm/activehashie.svg)](https://www.npmjs.com/package/activehashie)
 
-[![Dependency Status](https://david-dm.org/Narazaka/activehashie.js.svg)](https://david-dm.org/Narazaka/activehashie.js)
-[![devDependency Status](https://david-dm.org/Narazaka/activehashie.js/dev-status.svg)](https://david-dm.org/Narazaka/activehashie.js#info=devDependencies)
-[![Travis Build Status](https://travis-ci.org/Narazaka/activehashie.js.svg)](https://travis-ci.org/Narazaka/activehashie.js)
-[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/Narazaka/activehashie.js?svg=true)](https://ci.appveyor.com/project/Narazaka/activehashie-js)
+[![Dependency Status](https://david-dm.org/Narazaka/activehashie.js/status.svg)](https://david-dm.org/Narazaka/activehashie.js)
+[![devDependency Status](https://david-dm.org/Narazaka/activehashie.js/dev-status.svg)](https://david-dm.org/Narazaka/activehashie.js?type=dev)
+[![Travis Build Status](https://travis-ci.org/Narazaka/activehashie.js.svg?branch=master)](https://travis-ci.org/Narazaka/activehashie.js)
+[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/Narazaka/activehashie.js?svg=true&branch=master)](https://ci.appveyor.com/project/Narazaka/activehashie-js)
 [![codecov.io](https://codecov.io/github/Narazaka/activehashie.js/coverage.svg?branch=master)](https://codecov.io/github/Narazaka/activehashie.js?branch=master)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/7657d5c839564b44b9b7f6e47c6a9896)](https://www.codacy.com/app/narazaka/activehashie-js?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Narazaka/activehashie.js&amp;utm_campaign=Badge_Grade)
+[![Greenkeeper badge](https://badges.greenkeeper.io/Narazaka/activehashie.js.svg)](https://greenkeeper.io/)
 
 Immutable(currently) table whose api is like great [ActiveHash](https://github.com/zilkey/active_hash).
 
