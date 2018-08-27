@@ -184,7 +184,7 @@ export abstract class ActiveHashRelationBase<Record extends ActiveHashRecord> im
     private filterByMatch(
         source: ActiveHash<Record>, filteredIndexes: number[], conditions: Contitions<Record>, not = false,
     ) {
-        const columns = Object.keys(conditions);
+        const columns = Object.keys(conditions) as Array<keyof Record>;
         if (!columns.length) return filteredIndexes;
         return filteredIndexes.filter((index) => {
             const record = source.data[index];

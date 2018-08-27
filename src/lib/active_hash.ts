@@ -20,7 +20,7 @@ export class ActiveHash<Record extends ActiveHashRecord> implements EagerQueryab
     /** index columns */
     readonly indexColumns: ReadonlyArray<keyof(Record)>;
     private _data: Record[];
-    private recordIndexes: Map<string, RecordIndex>;
+    private recordIndexes: Map<keyof Record, RecordIndex>;
 
     constructor(
         name: string,
