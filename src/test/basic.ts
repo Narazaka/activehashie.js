@@ -1,5 +1,5 @@
 /* tslint:disable:variable-name max-classes-per-file */
-import test, {Context, GenericTestContext} from "ava";
+import test, { ExecutionContext } from "ava";
 import {ActiveHash, ActiveHashRecord, Queryable} from "../lib";
 import {toId} from "./util";
 
@@ -33,7 +33,7 @@ ItemGroup.setData([
 ]);
 
 function queryTestFor(model: Queryable<ItemRecord>) {
-    return (t: GenericTestContext<Context<any>>) => {
+    return (t: ExecutionContext) => {
         t.is(model.length, 6);
         t.is(model.find(11).name, "n11");
         t.throws(() => model.find(100));
