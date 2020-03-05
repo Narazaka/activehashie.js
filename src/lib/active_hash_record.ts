@@ -4,7 +4,7 @@ import {ActiveHashRelationBase} from "./active_hash_relation_base";
 
 export class ActiveHashRecord implements ActiveHashRecordBase {
     id: any;
-    _parentTable: ActiveHash<this>;
+    _parentTable: ActiveHash<any>;
 
     constructor(source: ActiveHashRecordBase) {
         Object.assign(this, source);
