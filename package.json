@@ -13,7 +13,8 @@
   "scripts": {
     "dist": "shx rm -rf dist && tsc",
     "test": "nyc -r html -r text -r lcov ava ./dist/es2015/test/*.js",
-    "lint": "tslint -p .",
+    "lint": "eslint --ext .js,.ts .",
+    "lint:fix": "eslint --fix --ext .js,.ts .",
     "prepare": "npm run dist",
     "prepublishOnly": "npm run lint && npm run test"
   },
@@ -38,10 +39,17 @@
     "pluralize": "^8.0.0"
   },
   "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^2.22.0",
+    "@typescript-eslint/parser": "^2.22.0",
     "ava": "^1.0.1",
+    "eslint": "^6.8.0",
+    "eslint-config-airbnb-typescript": "^7.0.0",
+    "eslint-config-prettier": "^6.10.0",
+    "eslint-plugin-import": "^2.20.1",
+    "eslint-plugin-prettier": "^3.1.2",
     "nyc": "^15.0.0",
+    "prettier": "^1.19.1",
     "shx": "^0.3.2",
-    "tslint": "^6.0.0",
     "typescript": "^3.8.3"
   }
 }

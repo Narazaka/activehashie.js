@@ -1,9 +1,7 @@
-import difference = require("lodash.difference");
-import intersection = require("lodash.intersection");
-import {ActiveHash} from "./active_hash";
-import {ActiveHashRecord} from "./active_hash_record";
-import {ActiveHashRelationEager} from "./active_hash_relation_eager";
-import {ActiveHashRelationLazy} from "./active_hash_relation_lazy";
+import { ActiveHash } from "./active_hash";
+import { ActiveHashRecord } from "./active_hash_record";
+import { ActiveHashRelationEager } from "./active_hash_relation_eager";
+import { ActiveHashRelationLazy } from "./active_hash_relation_lazy";
 import {
     ActiveHashRecordFilter,
     ActiveHashRecordMapper,
@@ -12,11 +10,15 @@ import {
     Contitions,
     Queryable,
 } from "./queryable";
-import {RecordNotFound} from "./record_not_found";
+import { RecordNotFound } from "./record_not_found";
+
+import difference = require("lodash.difference");
+import intersection = require("lodash.intersection");
 
 export abstract class ActiveHashRelationBase<Record extends ActiveHashRecord> implements Queryable<Record> {
     protected source: ActiveHash<Record>;
-    protected readonly abstract filteredIndexes: number[];
+
+    protected abstract readonly filteredIndexes: number[];
 
     get name() {
         return this.source.name;
@@ -43,7 +45,8 @@ export abstract class ActiveHashRelationBase<Record extends ActiveHashRecord> im
     ): Map<Result, ActiveHashRelationBase<Record>>;
 
     abstract groupByColumn<Column extends keyof Record, Result>(
-        column: Column, callback: ActiveHashRecordValueMapper<Record, Column, Result>,
+        column: Column,
+        callback: ActiveHashRecordValueMapper<Record, Column, Result>,
     ): Map<Result, ActiveHashRelationBase<Record>>;
 
     abstract none(): ActiveHashRelationBase<Record>;
@@ -51,7 +54,8 @@ export abstract class ActiveHashRelationBase<Record extends ActiveHashRecord> im
     abstract filter(callback: ActiveHashRecordFilter<Record>): ActiveHashRelationBase<Record>;
 
     abstract filterByColumn<Column extends keyof Record>(
-        column: Column, callback: ActiveHashRecordValueFilter<Record, Column>,
+        column: Column,
+        callback: ActiveHashRecordValueFilter<Record, Column>,
     ): ActiveHashRelationBase<Record>;
 
     findBy(conditions: Contitions<Record>): Record | undefined {
@@ -59,12 +63,11 @@ export abstract class ActiveHashRelationBase<Record extends ActiveHashRecord> im
     }
 
     find(id: any) {
-        const record = this.findBy({id} as any);
+        const record = this.findBy({ id } as any);
         if (record) {
             return record;
-        } else {
-            throw new RecordNotFound(`Couldn't find ${this.source.name} with ID=${id}`);
         }
+        throw new RecordNotFound(`Couldn't find ${this.source.name} with ID=${id}`);
     }
 
     get length() {
@@ -72,45 +75,49 @@ export abstract class ActiveHashRelationBase<Record extends ActiveHashRecord> im
     }
 
     toArray() {
-        return this.filteredIndexes.map((index) => this.source.data[index]);
+        return this.filteredIndexes.map(index => this.source.data[index]);
     }
 
     pluck<Column extends keyof Record>(column: Column): Array<Record[Column]>;
+
     pluck(...columns: Array<keyof Record>): Array<Array<Record[keyof Record]>>;
+
     pluck(...columns: Array<keyof Record>) {
         if (columns.length === 1) {
             const column = columns[0];
-            return this.toArray().map((record) => record[column]) as any;
-        } else {
-            return this.toArray().map((record) => columns.map((column) => record[column]));
+            return this.toArray().map(record => record[column]) as any;
         }
+        return this.toArray().map(record => columns.map(column => record[column]));
     }
 
     protected buildWhereFilder(conditions: Contitions<Record>) {
         return (source: ActiveHash<Record>, filteredIndexes: number[]) => {
-            const {indexes, restConditions} = this.filterByIndex(source, filteredIndexes, conditions);
+            const { indexes, restConditions } = this.filterByIndex(source, filteredIndexes, conditions);
             return this.filterByMatch(source, indexes, restConditions);
         };
     }
 
     protected buildNotFinder(conditions: Contitions<Record>) {
         return (source: ActiveHash<Record>, filteredIndexes: number[]) => {
-            const {indexes, restConditions} = this.filterByIndex(source, filteredIndexes, conditions, true);
+            const { indexes, restConditions } = this.filterByIndex(source, filteredIndexes, conditions, true);
             return this.filterByMatch(source, indexes, restConditions, true);
         };
     }
 
+    // eslint-disable-next-line class-methods-use-this
     protected buildFilterFinder(callback: (record: Record) => boolean) {
         return (source: ActiveHash<Record>, filteredIndexes: number[]) => {
-            return filteredIndexes.filter((index) => callback(source.data[index]));
+            return filteredIndexes.filter(index => callback(source.data[index]));
         };
     }
 
+    // eslint-disable-next-line class-methods-use-this
     protected buildFilterByColumnFinder<Column extends keyof Record>(
-        column: Column, callback: (value: Record[Column]) => boolean,
+        column: Column,
+        callback: (value: Record[Column]) => boolean,
     ) {
         return (source: ActiveHash<Record>, filteredIndexes: number[]) => {
-            return filteredIndexes.filter((index) => callback(source.data[index][column]));
+            return filteredIndexes.filter(index => callback(source.data[index][column]));
         };
     }
 
@@ -159,8 +166,12 @@ export abstract class ActiveHashRelationBase<Record extends ActiveHashRecord> im
         return indexGroups;
     }
 
+    // eslint-disable-next-line class-methods-use-this
     private filterByIndex(
-        source: ActiveHash<Record>, filteredIndexes: number[], conditions: Contitions<Record>, not = false,
+        source: ActiveHash<Record>,
+        filteredIndexes: number[],
+        conditions: Contitions<Record>,
+        not = false,
     ) {
         const filteredIndexesList = [];
         const restConditions: Contitions<Record> = {};
@@ -174,27 +185,30 @@ export abstract class ActiveHashRelationBase<Record extends ActiveHashRecord> im
             }
         }
         return {
-            indexes: not ?
-                difference(filteredIndexes, ...filteredIndexesList) :
-                intersection(filteredIndexes, ...filteredIndexesList),
+            indexes: not
+                ? difference(filteredIndexes, ...filteredIndexesList)
+                : intersection(filteredIndexes, ...filteredIndexesList),
             restConditions,
         };
     }
 
+    // eslint-disable-next-line class-methods-use-this
     private filterByMatch(
-        source: ActiveHash<Record>, filteredIndexes: number[], conditions: Contitions<Record>, not = false,
+        source: ActiveHash<Record>,
+        filteredIndexes: number[],
+        conditions: Contitions<Record>,
+        not = false,
     ) {
         const columns = Object.keys(conditions) as Array<keyof Record>;
         if (!columns.length) return filteredIndexes;
-        return filteredIndexes.filter((index) => {
+        return filteredIndexes.filter(index => {
             const record = source.data[index];
             const matched = columns.every((column: keyof Record) => {
                 const value = conditions[column];
                 if (value instanceof Array) {
                     return value.indexOf(record[column]) !== -1;
-                } else {
-                    return record[column] === value;
                 }
+                return record[column] === value;
             });
             return not ? !matched : matched;
         });

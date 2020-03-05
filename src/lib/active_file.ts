@@ -1,26 +1,30 @@
 import * as fs from "fs";
-import snakeCase = require("lodash.snakecase");
 import * as path from "path";
 import * as pluralize from "pluralize";
-import {ActiveHash} from "./active_hash";
-import {ActiveHashRecord, ActiveHashRecordBase} from "./active_hash_record";
-import {ActiveHashRelationEager} from "./active_hash_relation_eager";
-import {ActiveHashRelationLazy} from "./active_hash_relation_lazy";
+import { ActiveHash } from "./active_hash";
+import { ActiveHashRecord, ActiveHashRecordBase } from "./active_hash_record";
+import { ActiveHashRelationEager } from "./active_hash_relation_eager";
+import { ActiveHashRelationLazy } from "./active_hash_relation_lazy";
+
+import snakeCase = require("lodash.snakecase");
 
 export class ActiveFile<Record extends ActiveHashRecord> extends ActiveHash<Record> {
     readonly filename?: string;
+
     readonly filenames?: string[];
+
     readonly rootPath?: string;
+
     dataLoaded = false;
 
     constructor(
         name: string,
-        recordClass: new(source: ActiveHashRecordBase) => Record,
+        recordClass: new (source: ActiveHashRecordBase) => Record,
         options: {
-            indexColumns?: Array<keyof(Record)>,
-            filename?: string,
-            filenames?: string[],
-            rootPath?: string,
+            indexColumns?: Array<keyof Record>;
+            filename?: string;
+            filenames?: string[];
+            rootPath?: string;
         } = {},
     ) {
         super(name, recordClass, options);
@@ -35,6 +39,7 @@ export class ActiveFile<Record extends ActiveHashRecord> extends ActiveHash<Reco
         this.setData(this.loadFiles());
     }
 
+    // eslint-disable-next-line class-methods-use-this, @typescript-eslint/no-unused-vars
     loadFile(_: string): any {
         throw new Error("Override Me");
     }
@@ -46,7 +51,7 @@ export class ActiveFile<Record extends ActiveHashRecord> extends ActiveHash<Reco
             if (fileData instanceof Array) {
                 data.push(...fileData);
             } else {
-                data.push(...Object.keys(fileData).map((key) => (fileData as any)[key]));
+                data.push(...Object.keys(fileData).map(key => (fileData as any)[key]));
             }
         }
         return data;
@@ -59,19 +64,18 @@ export class ActiveFile<Record extends ActiveHashRecord> extends ActiveHash<Reco
 
     get fullPaths() {
         if (this.filenames && this.filenames.length) {
-            return this.filenames
-                .map((filename) => path.join(this.actualRootPath, `${filename}.${this.extension}`));
-        } else {
-            if (fs.existsSync(this.fullPathBase)) {
-                return fs.readdirSync(this.fullPathBase)
-                    .filter((filename) => path.extname(filename) === `.${this.extension}`)
-                    .map((filename) => path.join(this.fullPathBase, filename));
-            } else {
-                return [`${this.fullPathBase}.${this.extension}`];
-            }
+            return this.filenames.map(filename => path.join(this.actualRootPath, `${filename}.${this.extension}`));
         }
+        if (fs.existsSync(this.fullPathBase)) {
+            return fs
+                .readdirSync(this.fullPathBase)
+                .filter(filename => path.extname(filename) === `.${this.extension}`)
+                .map(filename => path.join(this.fullPathBase, filename));
+        }
+        return [`${this.fullPathBase}.${this.extension}`];
     }
 
+    // eslint-disable-next-line class-methods-use-this
     protected get extension(): string {
         throw new Error("Override Me");
     }
@@ -80,7 +84,7 @@ export class ActiveFile<Record extends ActiveHashRecord> extends ActiveHash<Reco
         return this.rootPath || ".";
     }
 
-    isExists(record: {id: any}) {
+    isExists(record: { id: any }) {
         if (!this.dataLoaded) this.reload();
         return super.isExists(record);
     }
@@ -106,7 +110,9 @@ export class ActiveFile<Record extends ActiveHashRecord> extends ActiveHash<Reco
     }
 
     pluck<Column extends keyof Record>(column: Column): Array<Record[Column]>;
+
     pluck(...columns: Array<keyof Record>): Array<Array<Record[keyof Record]>>;
+
     pluck(...columns: Array<keyof Record>) {
         if (!this.dataLoaded) this.reload();
         return super.pluck(...columns) as any;

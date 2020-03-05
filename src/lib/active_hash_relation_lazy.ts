@@ -1,7 +1,7 @@
-import {ActiveHash} from "./active_hash";
-import {ActiveHashRecord} from "./active_hash_record";
-import {ActiveHashRelationBase} from "./active_hash_relation_base";
-import {ActiveHashRelationEager} from "./active_hash_relation_eager";
+import { ActiveHash } from "./active_hash";
+import { ActiveHashRecord } from "./active_hash_record";
+import { ActiveHashRelationBase } from "./active_hash_relation_base";
+import { ActiveHashRelationEager } from "./active_hash_relation_eager";
 import {
     ActiveHashRecordFilter,
     ActiveHashRecordMapper,
@@ -11,8 +11,7 @@ import {
     LazyQueryable,
 } from "./queryable";
 
-export class ActiveHashRelationLazy<Record extends ActiveHashRecord>
-    extends ActiveHashRelationBase<Record>
+export class ActiveHashRelationLazy<Record extends ActiveHashRecord> extends ActiveHashRelationBase<Record>
     implements LazyQueryable<Record> {
     private filters: Array<(source: ActiveHash<Record>, filteredIndexes: number[]) => number[]>;
 
@@ -64,7 +63,8 @@ export class ActiveHashRelationLazy<Record extends ActiveHashRecord>
     }
 
     groupByColumn<Column extends keyof Record, Result>(
-        column: Column, callback: ActiveHashRecordValueMapper<Record, Column, Result>,
+        column: Column,
+        callback: ActiveHashRecordValueMapper<Record, Column, Result>,
     ) {
         const indexGroups = this.buildIndexGroupsByColumn(column, callback);
         const groups: Map<Result, ActiveHashRelationLazy<Record>> = new Map();

@@ -1,9 +1,10 @@
-/* tslint:disable:variable-name max-classes-per-file */
+/* eslint-disable max-classes-per-file */
+// eslint-disable-next-line import/no-extraneous-dependencies
 import test from "ava";
 import * as fs from "fs";
 import * as path from "path";
-import {ActiveHashRecord, ActiveYaml} from "../lib";
-import {toId} from "./util";
+import { ActiveHashRecord, ActiveYaml } from "../lib";
+import { toId } from "./util";
 
 function fromCwd(target: string) {
     return path.join(__dirname, target);
@@ -15,13 +16,15 @@ class ItemGroupRecord extends ActiveHashRecord {
 
 class ItemRecord extends ActiveHashRecord {
     name: string;
+
     type: string;
+
     item_group_id: number;
 }
 
-const ItemGroup = new ActiveYaml("ItemGroup", ItemGroupRecord, {rootPath: fromCwd(".")});
+const ItemGroup = new ActiveYaml("ItemGroup", ItemGroupRecord, { rootPath: fromCwd(".") });
 
-const Item = new ActiveYaml("Item", ItemRecord, {rootPath: fromCwd(".")});
+const Item = new ActiveYaml("Item", ItemRecord, { rootPath: fromCwd(".") });
 
 test.before(() => {
     fs.writeFileSync(
@@ -77,12 +80,12 @@ test.after(() => {
     fs.rmdirSync(fromCwd("items"));
 });
 
-test("from single file", (t) => {
+test("from single file", t => {
     t.is(ItemGroup.length, 2);
     t.deepEqual(toId(ItemGroup.all()), [1, 2]);
 });
 
-test("from multiple files", (t) => {
+test("from multiple files", t => {
     t.is(Item.length, 4);
     t.deepEqual(toId(Item.all()), [11, 12, 21, 22]);
     fs.unlinkSync(fromCwd("items/data2.yml"));

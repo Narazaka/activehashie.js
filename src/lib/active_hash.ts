@@ -1,6 +1,6 @@
-import {ActiveHashRecord, ActiveHashRecordBase} from "./active_hash_record";
-import {ActiveHashRelationEager} from "./active_hash_relation_eager";
-import {ActiveHashRelationLazy} from "./active_hash_relation_lazy";
+import { ActiveHashRecord, ActiveHashRecordBase } from "./active_hash_record";
+import { ActiveHashRelationEager } from "./active_hash_relation_eager";
+import { ActiveHashRelationLazy } from "./active_hash_relation_lazy";
 import {
     ActiveHashRecordFilter,
     ActiveHashRecordMapper,
@@ -15,17 +15,21 @@ type RecordIndex = Map<any, number[]>;
 export class ActiveHash<Record extends ActiveHashRecord> implements EagerQueryable<Record> {
     /** table name */
     readonly name: string;
+
     /** record class */
-    readonly recordClass: new(source: ActiveHashRecordBase) => Record;
+    readonly recordClass: new (source: ActiveHashRecordBase) => Record;
+
     /** index columns */
-    readonly indexColumns: ReadonlyArray<keyof(Record)>;
+    readonly indexColumns: ReadonlyArray<keyof Record>;
+
     private _data: Record[];
+
     private recordIndexes: Map<keyof Record, RecordIndex>;
 
     constructor(
         name: string,
-        recordClass: new(source: ActiveHashRecordBase) => Record,
-        options: {indexColumns?: Array<keyof(Record)>} = {},
+        recordClass: new (source: ActiveHashRecordBase) => Record,
+        options: { indexColumns?: Array<keyof Record> } = {},
     ) {
         this.name = name;
         this.indexColumns = Object.freeze((options.indexColumns || []).concat(["id"]));
@@ -33,14 +37,16 @@ export class ActiveHash<Record extends ActiveHashRecord> implements EagerQueryab
         this.resetData();
     }
 
-    get data() { return this._data; }
+    get data() {
+        return this._data;
+    }
 
     setData(data: ActiveHashRecordBase[]) {
         this.resetData();
         this.push(...data);
     }
 
-    isExists(record: {id: any}) {
+    isExists(record: { id: any }) {
         return (this.recordIndexes.get("id") as RecordIndex).has(record.id);
     }
 
@@ -50,6 +56,7 @@ export class ActiveHash<Record extends ActiveHashRecord> implements EagerQueryab
         let index = 0;
         for (const record of records) {
             if (record.id == null) record.id = ++nextId;
+            // eslint-disable-next-line new-cap
             useRecords[index] = record instanceof this.recordClass ? record : new this.recordClass(record);
             ++index;
         }
@@ -69,9 +76,9 @@ export class ActiveHash<Record extends ActiveHashRecord> implements EagerQueryab
         values: Array<Record[Column] | null | undefined>,
     ) {
         const recordIndex = this.recordIndexes.get(column);
-        if (!recordIndex) return;
+        if (!recordIndex) return undefined;
         return values
-            .map((value) => recordIndex.get(value))
+            .map(value => recordIndex.get(value))
             .reduce((allIndexes, indexes) => (allIndexes as number[]).concat(indexes || []), []) as number[];
     }
 
@@ -104,7 +111,8 @@ export class ActiveHash<Record extends ActiveHashRecord> implements EagerQueryab
     }
 
     groupByColumn<Column extends keyof Record, Result>(
-        column: Column, callback: ActiveHashRecordValueMapper<Record, Column, Result>,
+        column: Column,
+        callback: ActiveHashRecordValueMapper<Record, Column, Result>,
     ) {
         return this.all().groupByColumn(column, callback);
     }
@@ -138,14 +146,15 @@ export class ActiveHash<Record extends ActiveHashRecord> implements EagerQueryab
     }
 
     pluck<Column extends keyof Record>(column: Column): Array<Record[Column]>;
+
     pluck(...columns: Array<keyof Record>): Array<Array<Record[keyof Record]>>;
+
     pluck(...columns: Array<keyof Record>) {
         if (columns.length === 1) {
             const column = columns[0];
-            return this.toArray().map((record) => record[column]) as any;
-        } else {
-            return this.toArray().map((record) => columns.map((column) => record[column]));
+            return this.toArray().map(record => record[column]) as any;
         }
+        return this.toArray().map(record => columns.map(column => record[column]));
     }
 
     private addToRecordIndex(records: Record[], minIndex: number) {

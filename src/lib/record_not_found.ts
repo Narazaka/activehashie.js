@@ -1,1 +1,1 @@
-export class RecordNotFound extends Error { }
+export class RecordNotFound extends Error {}

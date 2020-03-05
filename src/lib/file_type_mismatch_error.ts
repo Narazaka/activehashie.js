@@ -1,1 +1,1 @@
-export class FileTypeMismatchError extends Error { }
+export class FileTypeMismatchError extends Error {}

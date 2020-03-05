@@ -1,17 +1,19 @@
-import {ActiveHashRecord} from "./active_hash_record";
-import {ActiveHashRelationBase} from "./active_hash_relation_base";
-import {ActiveHashRelationEager} from "./active_hash_relation_eager";
-import {ActiveHashRelationLazy} from "./active_hash_relation_lazy";
+import { ActiveHashRecord } from "./active_hash_record";
+import { ActiveHashRelationBase } from "./active_hash_relation_base";
+import { ActiveHashRelationEager } from "./active_hash_relation_eager";
+import { ActiveHashRelationLazy } from "./active_hash_relation_lazy";
 
 export type Contitions<Record extends ActiveHashRecord> = {
     [column in keyof Record]?: Record[column] | Array<Record[column]> | null | undefined;
 };
 export type ActiveHashRecordFilter<Record extends ActiveHashRecord> = (record: Record) => boolean;
-export type ActiveHashRecordValueFilter<Record extends ActiveHashRecord, Column extends keyof Record> =
-    (value: Record[Column]) => boolean;
+export type ActiveHashRecordValueFilter<Record extends ActiveHashRecord, Column extends keyof Record> = (
+    value: Record[Column],
+) => boolean;
 export type ActiveHashRecordMapper<Record extends ActiveHashRecord, Result> = (record: Record) => Result;
-export type ActiveHashRecordValueMapper<Record extends ActiveHashRecord, Column extends keyof Record, Result> =
-    (value: Record[Column]) => Result;
+export type ActiveHashRecordValueMapper<Record extends ActiveHashRecord, Column extends keyof Record, Result> = (
+    value: Record[Column],
+) => Result;
 
 export interface Queryable<Record extends ActiveHashRecord> {
     name: string;
@@ -22,16 +24,17 @@ export interface Queryable<Record extends ActiveHashRecord> {
     where(conditions?: Contitions<Record>): ActiveHashRelationBase<Record>;
     not(conditions: Contitions<Record>): ActiveHashRelationBase<Record>;
     group<Column extends keyof Record>(column: Column): Map<Record[Column], ActiveHashRelationBase<Record>>;
-    groupBy<Result>(
-        callback: ActiveHashRecordMapper<Record, Result>,
-    ): Map<Result, ActiveHashRelationBase<Record>>;
+    groupBy<Result>(callback: ActiveHashRecordMapper<Record, Result>): Map<Result, ActiveHashRelationBase<Record>>;
     groupByColumn<Column extends keyof Record, Result>(
-        column: Column, callback: ActiveHashRecordValueMapper<Record, Column, Result>,
+        column: Column,
+        callback: ActiveHashRecordValueMapper<Record, Column, Result>,
     ): Map<Result, ActiveHashRelationBase<Record>>;
     none(): ActiveHashRelationBase<Record>;
     filter(callback: ActiveHashRecordFilter<Record>): ActiveHashRelationBase<Record>;
-    filterByColumn<Column extends keyof Record>(column: Column, callback: ActiveHashRecordValueFilter<Record, Column>):
-        ActiveHashRelationBase<Record>;
+    filterByColumn<Column extends keyof Record>(
+        column: Column,
+        callback: ActiveHashRecordValueFilter<Record, Column>,
+    ): ActiveHashRelationBase<Record>;
     findBy(conditions: Contitions<Record>): Record | undefined;
     find(id: any): Record;
     toArray(): Record[];
@@ -58,13 +61,16 @@ export interface QueryableByEvaluation<
         callback: ActiveHashRecordMapper<Record, Result>,
     ): Map<Result, ActiveHashRelationByEvaluation<Record>[Evaluation]>;
     groupByColumn<Column extends keyof Record, Result>(
-        column: Column, callback: ActiveHashRecordValueMapper<Record, Column, Result>,
+        column: Column,
+        callback: ActiveHashRecordValueMapper<Record, Column, Result>,
     ): Map<Result, ActiveHashRelationByEvaluation<Record>[Evaluation]>;
     none(): ActiveHashRelationByEvaluation<Record>[Evaluation];
     filter(callback: ActiveHashRecordFilter<Record>): ActiveHashRelationByEvaluation<Record>[Evaluation];
-    filterByColumn<Column extends keyof Record>(column: Column, callback: ActiveHashRecordValueFilter<Record, Column>):
-        ActiveHashRelationByEvaluation<Record>[Evaluation];
+    filterByColumn<Column extends keyof Record>(
+        column: Column,
+        callback: ActiveHashRecordValueFilter<Record, Column>,
+    ): ActiveHashRelationByEvaluation<Record>[Evaluation];
 }
 
-export interface EagerQueryable<Record extends ActiveHashRecord> extends QueryableByEvaluation<Record, "eager"> { }
-export interface LazyQueryable<Record extends ActiveHashRecord> extends QueryableByEvaluation<Record, "lazy"> { }
+export interface EagerQueryable<Record extends ActiveHashRecord> extends QueryableByEvaluation<Record, "eager"> {}
+export interface LazyQueryable<Record extends ActiveHashRecord> extends QueryableByEvaluation<Record, "lazy"> {}
