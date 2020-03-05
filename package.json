@@ -12,11 +12,12 @@
   ],
   "scripts": {
     "dist": "shx rm -rf dist && tsc",
-    "test": "nyc -r html -r text -r lcov ava ./dist/es2015/test/*.js",
+    "test": "npm run lint && npm run ava",
+    "ava": "nyc -r html -r text -r lcov ava ./dist/es2015/test/*.js",
     "lint": "eslint --ext .js,.ts .",
     "lint:fix": "eslint --fix --ext .js,.ts .",
     "prepare": "npm run dist",
-    "prepublishOnly": "npm run lint && npm run test"
+    "prepublishOnly": "npm run test"
   },
   "author": "Narazaka",
   "license": "MIT",
