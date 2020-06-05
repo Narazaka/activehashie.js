@@ -102,16 +102,8 @@ test("basic queries for lazy", queryTestFor(Item.lazy()));
 
 test("eager and lazy", t => {
     t.deepEqual(
-        Item.eager()
-            .where({ type: "b" })
-            .lazy()
-            .where({ item_group_id: 2 })
-            .toArray(),
-        Item.lazy()
-            .where({ type: "b" })
-            .eager()
-            .where({ item_group_id: 2 })
-            .toArray(),
+        Item.eager().where({ type: "b" }).lazy().where({ item_group_id: 2 }).toArray(),
+        Item.lazy().where({ type: "b" }).eager().where({ item_group_id: 2 }).toArray(),
     );
 });
 
